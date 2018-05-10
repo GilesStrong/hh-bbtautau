@@ -6,6 +6,7 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMVA/Reader.h"
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
+#include "DNN/TensorFlow/interface/TensorFlow.h"
 
 namespace analysis {
 namespace mva_study{
@@ -162,3 +163,58 @@ private:
 
 }
 }
+
+class DnnMvaVariables : public MvaVariablesBase {
+    private:
+        int nInputs = 10;
+        std::shared_ptr<tensorflow::GraphDef> graphDef;
+        std::shared_ptr<tensorflow::Session> session;
+        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
+        std::vector<tensorflow::Tensor> outputs;
+
+    public:
+        DnnMvaVariables(const std::string& _method_name, const std::string& model) {
+            graphDef = tensorflow::loadGraphDef(model)
+            session = tensorflow::createSession(graphDef)
+        }
+
+        virtual ~MvaVariablesBase() override {
+            tensorflow::closeSession(session);
+            delete graphDef;
+        }
+
+        virtual void AddEvent(analysis::EventInfoBase& eventbase, 
+                              const SampleId& /*mass*/ , int /* spin*/, 
+                              double /*sample_weight*/, int /*which_test*/) override {
+            const auto& Htt = eventbase.GetHiggsTTMomentum(false);
+            const auto& Htt_sv = eventbase.GetHiggsTTMomentum(true);
+            const auto& t1 = eventbase.GetLeg(1);
+            const auto& t2 = eventbase.GetLeg(2);
+
+            const auto& Hbb = eventbase.GetHiggsBB();
+            const auto& b1 = Hbb.GetFirstDaughter();
+            const auto& b2 = Hbb.GetSecondDaughter();
+
+            const auto& met = eventbase.GetMET();
+            
+            input.matrix<float>()(0, 0) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaPhi(t1.GetMomentum(), met.GetMomentum())));
+            input.matrix<float>()(0, 1) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaPhi(Htt_sv, met.GetMomentum())));
+            input.matrix<float>()(0, 2) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaR(b1.GetMomentum(), b2.GetMomentum())));
+            input.matrix<float>()(0, 3) = static_cast<float>(ROOT::Math::VectorUtil::DeltaR(b1.GetMomentum(), b2.GetMomentum())*Hbb.GetMomentum().Pt());
+            input.matrix<float>()(0, 4) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaR(t1.GetMomentum(), t2.GetMomentum())));
+            input.matrix<float>()(0, 5) = static_cast<float>(ROOT::Math::VectorUtil::DeltaR(t1.GetMomentum(), t2.GetMomentum())*Htt.Pt());
+            input.matrix<float>()(0, 6) = static_cast<float>(Calculate_MT(t1.GetMomentum(), met.GetMomentum()));
+            input.matrix<float>()(0, 7) = static_cast<float>(Calculate_MT(t2.GetMomentum(), met.GetMomentum()));
+            input.matrix<float>()(0, 8) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaPhi(Hbb.GetMomentum(), met.GetMomentum())));
+            input.matrix<float>()(0, 9) = static_cast<float>(std::abs(ROOT::Math::VectorUtil::DeltaPhi(Hbb.GetMomentum(), Htt_sv)));
+        }
+
+        virtual double Evaluate() override {
+            tensorflow::run(session, { { "input", input } }, { "output" }, &outputs);
+            return outputs[0].matrix<double>()(0, 0)
+        }
+
+        virtual nullptr GetReader() override {
+            return nullptr;
+        }
+};
