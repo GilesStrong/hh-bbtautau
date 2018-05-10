@@ -15,6 +15,7 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "AnaTuple.h"
 #include "EventAnalyzerCore.h"
 #include "NonResModel.h"
+#include "DnnVariables.h"
 
 namespace analysis {
 
