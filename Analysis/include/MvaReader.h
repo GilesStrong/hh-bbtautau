@@ -6,7 +6,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMVA/Reader.h"
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
-#include "DNN/TensorFlow/interface/TensorFlow.h"
 
 namespace analysis {
 namespace mva_study{
