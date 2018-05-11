@@ -5,7 +5,7 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
-#include "TensorFlow/interface/TensorFlow.h"
+#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 #include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
