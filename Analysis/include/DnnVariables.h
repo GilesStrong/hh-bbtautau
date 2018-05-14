@@ -18,7 +18,7 @@ class DnnMvaVariables : public MvaVariablesBase {
     private:
         tensorflow::GraphDef* graphDef;
         tensorflow::Session* session;
-        tensorflow::Tensor input(tensorflow::Tensor::DT_FLOAT, {1, nInputs});
+        tensorflow::Tensor input(tensorflow::type::DT_FLOAT, {1, nInputs});
         std::vector<tensorflow::Tensor> outputs;
 
         //Model config options //Todo: add way of changing this from config file
