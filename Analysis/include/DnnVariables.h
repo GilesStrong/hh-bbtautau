@@ -291,7 +291,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             for (const JetCandidate& jet : eventbase.GetJets()) {
                 hT_jets += jet.GetMomentum().Et();
             }
-            features["hT_jets"]
+            features["hT_jets"] = hT_jets;
 
             //MET
             features["met_px"] = met_p4.Px();
@@ -372,10 +372,10 @@ class DnnMvaVariables : public MvaVariablesBase {
             double hT, sT, centrality, eVis;
             getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
-            features["hT"]
-            features["sT"]
-            features["centrality"]
-            features["eVis"]
+            features["hT"] = hT;
+            features["sT"] = sT;
+            features["centrality"] = centrality;
+            features["eVis"] = eVis;
 
             double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
@@ -386,18 +386,18 @@ class DnnMvaVariables : public MvaVariablesBase {
                 &upsilon, &dShape,
                 &sphericityEigen0, &sphericityEigen1, &sphericityEigen2,
                 &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
-            features["sphericity"]
-            features["spherocity"]
-            features["aplanarity"]
-            features["aplanority"]
-            features["upsilon"]
-            features["dShape"]
-            features["sphericityEigen0"]
-            features["sphericityEigen1"]
-            features["sphericityEigen2"]
-            features["spherocityEigen0"]
-            features["spherocityEigen1"]
-            features["spherocityEigen2"]
+            features["sphericity"] = sphericity;
+            features["spherocity"] = spherocity;
+            features["aplanarity"] = aplanarity;
+            features["aplanority"] = aplanority;
+            features["upsilon"] = upsilon;
+            features["dShape"] = dShape;
+            features["sphericityEigen0"] = sphericityEigen0;
+            features["sphericityEigen1"] = sphericityEigen1;
+            features["sphericityEigen2"] = sphericityEigen2;
+            features["spherocityEigen0"] = spherocityEigen0;
+            features["spherocityEigen1"] = spherocityEigen1;
+            features["spherocityEigen2"] = spherocityEigen2;
 
             //Twist___________________________
             features["twist_b_0_b_1"] = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
@@ -417,8 +417,8 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["dR_t_0_t_1"] = DeltaR(t_0_p4, t_1_p4);
             features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);
 
-            for (size_t i = 0; i < nInputs; i++) { //Load selected input features into tensor with standardisation and nromalisation
-                input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
+            for (int i = 0; i < nInputs; i++) { //Load selected input features into tensor with standardisation and nromalisation
+                input.matrix<float>()(0, i) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
   
             /*size_t i = 0; //Todo: find better way of including features
