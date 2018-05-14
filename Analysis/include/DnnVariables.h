@@ -283,7 +283,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             //Global info
             double nJets = static_cast<double>(eventbase.GetNJets());
-            double hT_jets = 0
+            double hT_jets = 0;
             for (const JetCandidate& jet : eventbase.GetJets()) {
                 hT_jets += jet.GetMomentum().Et()
             }
@@ -398,9 +398,9 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             //['h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E']
             
-            size_t i = 0; //Todo: find better way of including features
+            std::size_t i = 0; //Todo: find better way of including features
             input.matrix<float>()(0, i) = static_cast<float>((h_tt_svFit_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, i) = static_cast<float>((t_1_mT; - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) = static_cast<float>((t_1_mT - means[i])/scales[i]); i++;
             input.matrix<float>()(0, i) = static_cast<float>((diH_kinFit_chi2 - means[i])/scales[i]); i++;
             input.matrix<float>()(0, i) = static_cast<float>((b_0_csv - means[i])/scales[i]); i++;
             input.matrix<float>()(0, i) = static_cast<float>((b_1_csv - means[i])/scales[i]); i++;
@@ -470,7 +470,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
         double Evaluate() override {
             tensorflow::run(session, { { "input", input } }, { "output" }, &outputs);
-            return outputs[0].matrix<double>()(0, 0)
+            return outputs[0].matrix<double>()(0, 0);
         }
 
         std::shared_ptr<TMVA::Reader> GetReader() override {
