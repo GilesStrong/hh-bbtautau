@@ -417,8 +417,8 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["dR_t_0_t_1"] = DeltaR(t_0_p4, t_1_p4);
             features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);
 
-            for (int i = 0; i < nInputs; i++) { //Load selected input features into tensor with standardisation and nromalisation
-                input.matrix<float>()(0, i) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
+            for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
+                input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
   
             /*size_t i = 0; //Todo: find better way of including features
