@@ -6,6 +6,7 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
+#include "tensorflow/core/framework/types.h"
 #include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
@@ -24,7 +25,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         //Model config options //Todo: add way of changing this from config file
         int nInputs = 67; 
         bool fixRotate = true;
-        std::vector<float> means{1.51975727e+02,  7.52654900e+01,  8.01863353e+01,  6.65015349e-01,
+        std::vector<double> means{1.51975727e+02,  7.52654900e+01,  8.01863353e+01,  6.65015349e-01,
                                 5.39720100e-01,  2.16281726e+00,  3.47394597e+02,  1.46177934e+02,
                                -3.43958888e+01,  2.40596679e+02,  1.74137283e+02, -6.14251191e+00,
                                 1.22171427e+00,  6.06015127e+01,  2.30166669e+00,  9.02781997e-03,
@@ -42,7 +43,7 @@ class DnnMvaVariables : public MvaVariablesBase {
                                 8.97469292e+01,  1.03336092e-01,  2.25481780e+00,  1.05431104e+00,
                                 7.96081071e+00,  2.29148069e-02,  2.62496733e+02};
 
-        std::vector<float> scales{1.84480552e+02, 5.64743918e+01, 1.80491078e+02, 7.21862605e-01,
+        std::vector<double> scales{1.84480552e+02, 5.64743918e+01, 1.80491078e+02, 7.21862605e-01,
                                1.08463901e+00, 8.57375541e-01, 2.27266132e+02, 1.31747969e+02,
                                8.95539784e+01, 1.69815686e+02, 8.14561298e+01, 4.03259743e+01,
                                1.29212491e+00, 3.81177567e+01, 9.22236194e-01, 3.47127055e+01,
@@ -69,7 +70,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             session = tensorflow::createSession(graphDef)
         }
 
-        ~MvaVariablesBase() override {
+        ~DnnMvaVariables() override {
             /*Close session and delelte model*/
             tensorflow::closeSession(session);
             delete graphDef;
@@ -227,7 +228,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             const auto& htt_vis_p4 = eventbase.GetHiggsTTMomentum(false);
             const auto& svFit_p4 = eventbase.GetHiggsTTMomentum(true);
-            const auto& t_0_p4 = eventbase.GetLeg(1).GetMomentum(); //Todo: Check ordering
+            const auto& t_1_p4 = eventbase.GetLeg(1).GetMomentum(); //Todo: Check ordering
             const auto& t_0_p4 = eventbase.GetLeg(2).GetMomentum();
 
             const auto& hbb_p4 = eventbase.GetHiggsBB().GetMomentum();
@@ -455,7 +456,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             return outputs[0].matrix<double>()(0, 0)
         }
 
-        nullptr GetReader() override {
+        std::shared_ptr<TMVA::Reader> GetReader() override {
             return nullptr;
         }
 };
