@@ -273,8 +273,11 @@ class DnnMvaVariables : public MvaVariablesBase {
             TLorentzVector hh_p4 = hbb_p4+htt_p4;
 
             //Global info
-            double nJets = static_cast<double>(eventbase.GetNJets()); //Todo: check these names
-            double hT_jets = static_cast<double>(eventbase.GetHTJets()); //Todo: check these names
+            double nJets = static_cast<double>(eventbase.GetNJets());
+            double hT_jets = 0
+            for (const JetCandidate& jet : eventbase.GetJets()) {
+                hT_jets += jet.GetMomentum().Et()
+            }
 
             //MET
             double met_px = met_p4.Px();
@@ -320,12 +323,12 @@ class DnnMvaVariables : public MvaVariablesBase {
             double h_tt_svFit_P = svFit_p4.P();
             double h_tt_svFit_E = svFit_p4.E();
             double h_tt_svFit_mass = svFit_p4.M();
-            double h_tt_svFit_mT = alculate_MT(Htt_sv, met);
+            double h_tt_svFit_mT = calculate_MT(eventbase.GetHiggsTTMomentum(true), eventbase.GetMET().GetMomentum());
 
             //KinFit
-            double diH_kinFit_mass = eventbase.GetKinFitResults().mass;
-            double diH_kinFit_chi2 = eventbase.GetKinFitResults().chi2;
-            double diH_kinFit_conv = eventbase.GetKinFitResults().conv;
+            double diH_kinFit_mass = static_cast<double>(eventbase.GetKinFitResults().mass);
+            double diH_kinFit_chi2 = static_cast<double>(eventbase.GetKinFitResults().chi2);
+            double diH_kinFit_conv = static_cast<double>(eventbase.GetKinFitResults().convergence);
 
             //h->bb
             double h_bb_px = hbb_p4.Px();
@@ -336,7 +339,6 @@ class DnnMvaVariables : public MvaVariablesBase {
             double h_bb_mass = hbb_p4.M();
 
             //h->tautau
-            auto htt_p4 = htt_vis_p4+met_p4;
             double h_tt_px = htt_p4.Px();
             double h_tt_py = htt_p4.Py();
             double h_tt_pz = htt_p4.Pz();
@@ -345,7 +347,6 @@ class DnnMvaVariables : public MvaVariablesBase {
             double h_tt_mass = htt_p4.M();
 
             //Di-higgs
-            auto hh_p4 = hbb_p4+htt_p4;
             double diH_px = hh_p4.Px();
             double diH_py = hh_p4.Py();
             double diH_pz = hh_p4.Pz();
