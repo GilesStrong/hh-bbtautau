@@ -230,7 +230,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             using namespace ROOT::Math::VectorUtil;
 
-            TLorentzVector t_0_p4, t_1_p4, bjet0_p4, bjet1_p4, met_p4, svFit_p4, hbb_p4, htt_p4, hh_p4;
+            TLorentzVector t_0_p4, t_1_p4, bjet0_p4, bjet1_p4, met_p4, svFit_p4;
             t_0_p4.SetPxPyPzE(eventbase.GetLeg(2).GetMomentum().Px(), eventbase.GetLeg(2).GetMomentum().Py(), eventbase.GetLeg(2).GetMomentum().Pz(), eventbase.GetLeg(2).GetMomentum().E()); //Todo: Check ordering
             t_1_p4.SetPxPyPzE(eventbase.GetLeg(1).GetMomentum().Px(), eventbase.GetLeg(1).GetMomentum().Py(), eventbase.GetLeg(1).GetMomentum().Pz(), eventbase.GetLeg(1).GetMomentum().E());
             bjet0_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().E());
@@ -239,23 +239,23 @@ class DnnMvaVariables : public MvaVariablesBase {
             svFit_p4.SetPxPyPzE(eventbase.GetHiggsTTMomentum(true).Px(), eventbase.GetHiggsTTMomentum(true).Py(), eventbase.GetHiggsTTMomentum(true).Pz(), eventbase.GetHiggsTTMomentum(true).E());
 
             //b-jet info
-            float b_0_csv = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
-            float b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
-            float b_0_mva = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
-            float b_1_csv = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
-            float b_1_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
-            float b_1_mva = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
+            double b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
+            double b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
+            double b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
+            double b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
+            double b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
+            double b_1_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
 
             //Order jets by pT
             if (bjet0_p4.Pt() < bjet1_p4.Pt()) {
-                bjet0_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).E());
-                b_0_csv = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
-                b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
-                b_0_mva = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
-                bjet1_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).E());
-                b_1_csv = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
-                b_1_rawf = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
-                b_1_mva = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
+                bjet0_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().E());
+                b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
+                b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
+                b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
+                bjet1_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().E());
+                b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
+                b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
+                b_1_mva = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
             }
 
             //Rotate event to have t_0 at phi=0
@@ -268,97 +268,97 @@ class DnnMvaVariables : public MvaVariablesBase {
                 t_1_p4.SetPhi(0);
             }
 
-            hbb_p4 = bjet0_p4+bjet1_p4;
-            htt_p4 = t_0_p4+t_1_p4+met_p4;
-            hh_p4 = hbb_p4+htt_p4;
+            TLorentzVector hbb_p4 = bjet0_p4+bjet1_p4;
+            TLorentzVector htt_p4 = t_0_p4+t_1_p4+met_p4;
+            TLorentzVector hh_p4 = hbb_p4+htt_p4;
 
             //Global info
-            nJets = static_cast<float>(*eventbase.GetNJets()); //Todo: check these names
-            hT_jets = static_cast<float>(*eventbase.hT_jets()); //Todo: check these names
+            double nJets = static_cast<double>(eventbase.GetNJets()); //Todo: check these names
+            double hT_jets = static_cast<double>(eventbase.GetHTJets()); //Todo: check these names
 
             //MET
-            float met_px = met_p4.Px();
-            float met_py = met_p4.Py();
-            float met_pT = met_p4.Pt();
+            double met_px = met_p4.Px();
+            double met_py = met_p4.Py();
+            double met_pT = met_p4.Pt();
 
             //Taus
-            float t_0_px = t_0_p4.Px();
-            float t_0_py = t_0_p4.Py();
-            float t_0_pz = t_0_p4.Pz();
-            float t_0_P = t_0_p4.P();
-            float t_0_E = t_0_p4.E();
-            float t_0_mass = t_0_p4.M();
-            float t_0_mT = Calculate_MT(t_0_p4, met_p4);
+            double t_0_px = t_0_p4.Px();
+            double t_0_py = t_0_p4.Py();
+            double t_0_pz = t_0_p4.Pz();
+            double t_0_P = t_0_p4.P();
+            double t_0_E = t_0_p4.E();
+            double t_0_mass = t_0_p4.M();
+            double t_0_mT = Calculate_MT(t_0_p4, met_p4);
 
-            float t_1_px = t_1_p4.Px();
-            float t_1_py = t_1_p4.Py();
-            float t_1_pz = t_1_p4.Pz();
-            float t_1_P = t_1_p4.P();
-            float t_1_E = t_1_p4.E();
-            float t_1_mass = t_1_p4.M();
-            float t_1_mT = Calculate_MT(t_1_p4, met_p4);
+            double t_1_px = t_1_p4.Px();
+            double t_1_py = t_1_p4.Py();
+            double t_1_pz = t_1_p4.Pz();
+            double t_1_P = t_1_p4.P();
+            double t_1_E = t_1_p4.E();
+            double t_1_mass = t_1_p4.M();
+            double t_1_mT = Calculate_MT(t_1_p4, met_p4);
 
             //Jets
-            float b_0_px = bjet0_p4.Px();
-            float b_0_py = bjet0_p4.Py();
-            float b_0_pz = bjet0_p4.Pz();
-            float b_0_P = bjet0_p4.P();
-            float b_0_E = bjet0_p4.E();
-            float b_0_mass = bjet0_p4.M();
+            double b_0_px = bjet0_p4.Px();
+            double b_0_py = bjet0_p4.Py();
+            double b_0_pz = bjet0_p4.Pz();
+            double b_0_P = bjet0_p4.P();
+            double b_0_E = bjet0_p4.E();
+            double b_0_mass = bjet0_p4.M();
 
-            float b_1_px = bjet1_p4.Px();
-            float b_1_py = bjet1_p4.Py();
-            float b_1_pz = bjet1_p4.Pz();
-            float b_1_P = bjet1_p4.P();
-            float b_1_E = bjet1_p4.E();
-            float b_1_mass = bjet1_p4.M();
+            double b_1_px = bjet1_p4.Px();
+            double b_1_py = bjet1_p4.Py();
+            double b_1_pz = bjet1_p4.Pz();
+            double b_1_P = bjet1_p4.P();
+            double b_1_E = bjet1_p4.E();
+            double b_1_mass = bjet1_p4.M();
 
             //SVFit
-            float h_tt_svFit_px = svFit_p4.Px();
-            float h_tt_svFit_py = svFit_p4.Py();
-            float h_tt_svFit_pz = svFit_p4.Pz();
-            float h_tt_svFit_P = svFit_p4.P();
-            float h_tt_svFit_E = svFit_p4.E();
-            float h_tt_svFit_mass = svFit_p4.M();
-            float h_tt_svFit_mT = alculate_MT(Htt_sv, met);
+            double h_tt_svFit_px = svFit_p4.Px();
+            double h_tt_svFit_py = svFit_p4.Py();
+            double h_tt_svFit_pz = svFit_p4.Pz();
+            double h_tt_svFit_P = svFit_p4.P();
+            double h_tt_svFit_E = svFit_p4.E();
+            double h_tt_svFit_mass = svFit_p4.M();
+            double h_tt_svFit_mT = alculate_MT(Htt_sv, met);
 
             //KinFit
-            float diH_kinFit_mass = eventbase.GetKinFitResults().mass;
-            float diH_kinFit_chi2 = eventbase.GetKinFitResults().chi2;
-            float diH_kinFit_conv = eventbase.GetKinFitResults().conv;
+            double diH_kinFit_mass = eventbase.GetKinFitResults().mass;
+            double diH_kinFit_chi2 = eventbase.GetKinFitResults().chi2;
+            double diH_kinFit_conv = eventbase.GetKinFitResults().conv;
 
             //h->bb
-            float h_bb_px = hbb_p4.Px();
-            float h_bb_py = hbb_p4.Py();
-            float h_bb_pz = hbb_p4.Pz();
-            float h_bb_P = hbb_p4.P();
-            float h_bb_E = hbb_p4.E();
-            float h_bb_mass = hbb_p4.M();
+            double h_bb_px = hbb_p4.Px();
+            double h_bb_py = hbb_p4.Py();
+            double h_bb_pz = hbb_p4.Pz();
+            double h_bb_P = hbb_p4.P();
+            double h_bb_E = hbb_p4.E();
+            double h_bb_mass = hbb_p4.M();
 
             //h->tautau
             auto htt_p4 = htt_vis_p4+met_p4;
-            float h_tt_px = htt_p4.Px();
-            float h_tt_py = htt_p4.Py();
-            float h_tt_pz = htt_p4.Pz();
-            float h_tt_P = htt_p4.P();
-            float h_tt_E = htt_p4.E();
-            float h_tt_mass = htt_p4.M();
+            double h_tt_px = htt_p4.Px();
+            double h_tt_py = htt_p4.Py();
+            double h_tt_pz = htt_p4.Pz();
+            double h_tt_P = htt_p4.P();
+            double h_tt_E = htt_p4.E();
+            double h_tt_mass = htt_p4.M();
 
             //Di-higgs
             auto hh_p4 = hbb_p4+htt_p4;
-            float diH_px = hh_p4.Px();
-            float diH_py = hh_p4.Py();
-            float diH_pz = hh_p4.Pz();
-            float diH_P = hh_p4.P();
-            float diH_E = hh_p4.E();
-            float diH_mass = hh_p4.M();
+            double diH_px = hh_p4.Px();
+            double diH_py = hh_p4.Py();
+            double diH_pz = hh_p4.Pz();
+            double diH_P = hh_p4.P();
+            double diH_E = hh_p4.E();
+            double diH_mass = hh_p4.M();
 
             //Shapes__________________________
-            float hT, sT, centrality, eVis;
+            double hT, sT, centrality, eVis;
             getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
 
-            float sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
+            double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
                 spherocityEigen0, spherocityEigen1, spherocityEigen2;
             getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
@@ -369,93 +369,93 @@ class DnnMvaVariables : public MvaVariablesBase {
                 &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
 
             //Twist___________________________
-            float twist_b_0_b_1 = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
-            float twist_b_0_t_0 = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
-            float twist_b_0_t_1 = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
-            float twist_b_1_t_0 = atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta())));
-            float twist_b_1_t_1 = atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta())));
-            float twist_t_0_t_1 = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
-            float twist_h_bb_h_tt = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
+            double twist_b_0_b_1 = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
+            double twist_b_0_t_0 = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
+            double twist_b_0_t_1 = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
+            double twist_b_1_t_0 = atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta())));
+            double twist_b_1_t_1 = atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta())));
+            double twist_t_0_t_1 = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
+            double twist_h_bb_h_tt = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
 
             //dR__________________________________
-            float dR_b_0_b_1 = DeltaR(bjet0_p4, bjet1_p4);
-            float dR_b_0_t_0 = DeltaR(bjet0_p4, t_0_p4);
-            float dR_b_0_t_1 = DeltaR(bjet0_p4, t_1_p4);
-            float dR_b_1_t_0 = DeltaR(bjet1_p4, t_0_p4);
-            float dR_b_1_t_1 = DeltaR(bjet1_p4, t_1_p4);
-            float dR_t_0_t_1 = DeltaR(t_0_p4, t_1_p4);
-            float dR_h_bb_h_tt = DeltaR(hbb_p4, htt_p4);
+            double dR_b_0_b_1 = DeltaR(bjet0_p4, bjet1_p4);
+            double dR_b_0_t_0 = DeltaR(bjet0_p4, t_0_p4);
+            double dR_b_0_t_1 = DeltaR(bjet0_p4, t_1_p4);
+            double dR_b_1_t_0 = DeltaR(bjet1_p4, t_0_p4);
+            double dR_b_1_t_1 = DeltaR(bjet1_p4, t_1_p4);
+            double dR_t_0_t_1 = DeltaR(t_0_p4, t_1_p4);
+            double dR_h_bb_h_tt = DeltaR(hbb_p4, htt_p4);
 
             //['h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E']
             
             int i = 0;
-            input.matrix<float>()(0, i) = (h_tt_svFit_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_1_mT; - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_kinFit_chi2 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_csv - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_csv - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_t_0_t_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_kinFit_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_bb_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_bb_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (hT - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_kinFit_conv - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_1_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_b_0_b_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_svFit_mT - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_svFit_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_svFit_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_P - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (hT_jets - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (met_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_mT - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_b_0_t_0 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (met_pT - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_1_E - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_0_E - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (centrality - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_bb_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_bb_P - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (diH_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (twist_t_0_t_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_mva - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_mva - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_px - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_h_bb_h_tt - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (met_py - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (sT - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_E - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (twist_b_0_t_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_P - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (twist_h_bb_h_tt - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_b_1_t_0 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_rawf - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_b_0_t_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_E - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (twist_b_0_b_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_pz - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (sphericity - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_tt_svFit_P - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_0_rawf - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_E - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (t_1_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (dR_b_1_t_1 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (twist_b_0_t_0 - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (b_1_mass - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (aplanarity - means[i])/scales[i]; i++;
-            input.matrix<float>()(0, i) = (h_bb_E - means[i])/scales[i]; i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_1_mT; - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_kinFit_chi2 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_csv - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_csv - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_t_0_t_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_kinFit_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_bb_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_bb_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((hT - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_kinFit_conv - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_1_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_b_0_b_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_mT - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_P - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((hT_jets - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((met_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_mT - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_b_0_t_0 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((met_pT - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_1_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_0_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((centrality - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_bb_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_bb_P - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((diH_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((twist_t_0_t_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_mva - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_mva - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_px - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_h_bb_h_tt - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((met_py - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((sT - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((twist_b_0_t_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_P - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((twist_h_bb_h_tt - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_b_1_t_0 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_rawf - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_b_0_t_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((twist_b_0_b_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_pz - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((sphericity - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_P - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_0_rawf - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((t_1_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((dR_b_1_t_1 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((twist_b_0_t_0 - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((b_1_mass - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((aplanarity - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, i) static_cast<float>((h_bb_E - means[i])/scales[i]); i++;
         }
 
         double Evaluate() override {
