@@ -9,6 +9,23 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
+#include "tensorflow/core/framework/allocation_description.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                  
+#include "tensorflow/core/framework/allocator.h"
+#include "tensorflow/core/framework/tensor.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                                  
+#include "tensorflow/core/framework/tensor_description.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                      
+#include "tensorflow/core/framework/tensor_shape.h"
+#include "tensorflow/core/framework/tensor_types.h"
+#include "tensorflow/core/framework/types.h"
+#include "tensorflow/core/framework/types.pb.h"
+#include "tensorflow/core/lib/core/refcount.h"
+#include "tensorflow/core/lib/core/status.h"
+#include "tensorflow/core/lib/core/stringpiece.h"
+#include "tensorflow/core/lib/gtl/inlined_vector.h"
+#include "tensorflow/core/platform/logging.h"
+#include "tensorflow/core/platform/macros.h"
+#include "tensorflow/core/platform/types.h"
+
 namespace analysis {
 namespace mva_study{
 
