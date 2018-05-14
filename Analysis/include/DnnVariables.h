@@ -18,7 +18,7 @@ class DnnMvaVariables : public MvaVariablesBase {
     private:
         tensorflow::GraphDef* graphDef;
         tensorflow::Session* session;
-        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
+        tensorflow::Tensor input(tensorflow::Tensor::DT_FLOAT, {1, nInputs});
         std::vector<tensorflow::Tensor> outputs;
 
         //Model config options //Todo: add way of changing this from config file
@@ -242,6 +242,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             double b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
             double b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
             double b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
+
             double b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
             double b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
             double b_1_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
@@ -252,6 +253,7 @@ class DnnMvaVariables : public MvaVariablesBase {
                 b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
                 b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
                 b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
+
                 bjet1_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().E());
                 b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
                 b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
@@ -323,7 +325,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             double h_tt_svFit_P = svFit_p4.P();
             double h_tt_svFit_E = svFit_p4.E();
             double h_tt_svFit_mass = svFit_p4.M();
-            double h_tt_svFit_mT = calculate_MT(eventbase.GetHiggsTTMomentum(true), eventbase.GetMET().GetMomentum());
+            double h_tt_svFit_mT = Calculate_MT(eventbase.GetHiggsTTMomentum(true), eventbase.GetMET().GetMomentum());
 
             //KinFit
             double diH_kinFit_mass = static_cast<double>(eventbase.GetKinFitResults().mass);
@@ -389,7 +391,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             //['h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E']
             
-            int i = 0;
+            int i = 0; //Todo: find better way of including features
             input.matrix<float>()(0, i) static_cast<float>((h_tt_svFit_mass - means[i])/scales[i]); i++;
             input.matrix<float>()(0, i) static_cast<float>((t_1_mT; - means[i])/scales[i]); i++;
             input.matrix<float>()(0, i) static_cast<float>((diH_kinFit_chi2 - means[i])/scales[i]); i++;
