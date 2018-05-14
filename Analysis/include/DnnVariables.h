@@ -6,7 +6,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-#include "tensorflow/core/framework/types.h"
 #include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
@@ -19,7 +18,7 @@ class DnnMvaVariables : public MvaVariablesBase {
     private:
         std::shared_ptr<tensorflow::GraphDef> graphDef;
         std::shared_ptr<tensorflow::Session> session;
-        tensorflow::Tensor input(DT_FLOAT, {1, nInputs});
+        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
         std::vector<tensorflow::Tensor> outputs;
 
         //Model config options //Todo: add way of changing this from config file
@@ -66,8 +65,8 @@ class DnnMvaVariables : public MvaVariablesBase {
             /*Model = name and location of models to be loaded, without .pb*/
 
             //Todo: add loading of config file with features, preprop settings, etc.
-            graphDef = tensorflow::loadGraphDef(model + ".pb")
-            session = tensorflow::createSession(graphDef)
+            graphDef = tensorflow::loadGraphDef(model + ".pb");
+            session = tensorflow::createSession(graphDef);
         }
 
         ~DnnMvaVariables() override {
@@ -76,7 +75,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             delete graphDef;
         }
 
-        void getGlobalEventInfo(auto* v_tau_0, auto* v_tau_1, auto* v_bJet_0, auto* v_bJet_1, auto* v_met,
+        void getGlobalEventInfo(TLorentzVector* v_tau_0, TLorentzVector* v_tau_1, TLorentzVector* v_bJet_0, TLorentzVector* v_bJet_1, TLorentzVector* v_met,
             double*  hT, double*  sT, double* centrality, double* eVis, bool tautau=false) {
             /*Fills referenced variables with global event information*/
 
@@ -85,42 +84,45 @@ class DnnMvaVariables : public MvaVariablesBase {
             *sT = 0;
             *centrality = 0;
             *eVis = 0;
+
             //HT
-            *hT += static_cast<float>(v_bJet_0->Et());
-            *hT += static_cast<float>(v_bJet_1->Et());
-            *hT += static_cast<float>(v_tau_0->Et());
+            *hT += v_bJet_0->Et();
+            *hT += v_bJet_1->Et();
+            *hT += v_tau_0->Et();
             if (tautau == true) {
-                *hT += static_cast<float>(v_tau_1->Et());
+                *hT += v_tau_1->Et();
             }
+
             //ST
             *sT += *hT;
             if (tautau == false) {
-                *sT += static_cast<float>(v_tau_1->Pt());
+                *sT += v_tau_1->Pt();
             }
             *sT += v_met->Pt();
+
             //Centrality
-            *eVis += static_cast<float>(v_tau_0->E());
-            *centrality += static_cast<float>(v_tau_0->Pt());
-            *eVis += static_cast<float>(v_tau_1->E());
-            *centrality += static_cast<float>(v_tau_1->Pt());
-            *eVis += static_cast<float>(v_bJet_0->E());
-            *centrality += static_cast<float>(v_bJet_0->Pt());
-            *eVis += static_cast<float>(v_bJet_1->E());
-            *centrality += static_cast<float>(v_bJet_1->Pt());
+            *eVis += v_tau_0->E();
+            *centrality += v_tau_0->Pt();
+            *eVis += v_tau_1->E();
+            *centrality += v_tau_1->Pt();
+            *eVis += v_bJet_0->E();
+            *centrality += v_bJet_0->Pt();
+            *eVis += v_bJet_1->E();
+            *centrality += v_bJet_1->Pt();
             *centrality /= *eVis;
         }
 
-        TMatrixD decomposeVector(auto* in) {
+        TMatrixD decomposeVector(TLorentzVector* in) {
             TMatrixD out(3, 3);
-            out(0, 0) = static_cast<float>(in->Px())*static_cast<float>(in->Px());
-            out(0, 1) = static_cast<float>(in->Px())*static_cast<float>(in->Py());
-            out(0, 2) = static_cast<float>(in->Px())*static_cast<float>(in->Pz());
-            out(1, 0) = static_cast<float>(in->Py())*static_cast<float>(in->Px());
-            out(1, 1) = static_cast<float>(in->Py())*static_cast<float>(in->Py());
-            out(1, 2) = static_cast<float>(in->Py())*static_cast<float>(in->Pz());
-            out(2, 0) = static_cast<float>(in->Pz())*static_cast<float>(in->Px());
-            out(2, 1) = static_cast<float>(in->Pz())*static_cast<float>(in->Py());
-            out(2, 2) = static_cast<float>(in->Pz())*static_cast<float>(in->Pz());
+            out(0, 0) = in->Px()*in->Px();
+            out(0, 1) = in->Px()*in->Py();
+            out(0, 2) = in->Px()*in->Pz();
+            out(1, 0) = in->Py()*in->Px();
+            out(1, 1) = in->Py()*in->Py();
+            out(1, 2) = in->Py()*in->Pz();
+            out(2, 0) = in->Pz()*in->Px();
+            out(2, 1) = in->Pz()*in->Py();
+            out(2, 2) = in->Pz()*in->Pz();
             return out;
         }
 
@@ -129,16 +131,16 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             TMatrixD decomp = decomposeVector(mom);
             *mat += decomp;
-            *div += pow(static_cast<float>(mom->P()), 2);
+            *div += pow(mom->P(), 2);
         }   
 
         void appendSpherocity(TMatrixD* mat, double* div, TLorentzVector* mom) {
             /*Used in calculating spherocity tensor*/
 
             TMatrixD decomp = decomposeVector(mom);
-            decomp *= 1/std::abs(static_cast<float>(mom->P()));
+            decomp *= 1/std::abs(mom->P());
             *mat += decomp;
-            *div += std::abs(static_cast<float>(mom->P()));
+            *div += std::abs(mom->P());
         }
 
         std::vector<double> getEigenValues(TMatrixD in) {
@@ -170,8 +172,8 @@ class DnnMvaVariables : public MvaVariablesBase {
             *dShape = 27*spherocityV[0]*spherocityV[1]*spherocityV[2];
         }
 
-        void getPrimaryEventShapes(auto* v_tau_0, auto* v_tau_1,
-            auto* v_bJet_0, auto* v_bJet_1,
+        void getPrimaryEventShapes(TLorentzVector* v_tau_0, TLorentzVector* v_tau_1,
+            TLorentzVector* v_bJet_0, TLorentzVector* v_bJet_1,
             double* sphericity, double* spherocity,
             double* aplanarity, double* aplanority,
             double* upsilon, double* dShape,
