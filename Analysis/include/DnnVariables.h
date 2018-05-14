@@ -20,6 +20,8 @@ class DnnMvaVariables : public MvaVariablesBase {
         bool fixRotate;
         std::vector<double> means;
         std::vector<double> scales;
+        std::map<std::string, double> features
+        std::vector<std::string> inputFeatures;
 
         tensorflow::GraphDef* graphDef;  
         tensorflow::Session* session;
@@ -35,7 +37,9 @@ class DnnMvaVariables : public MvaVariablesBase {
             session = tensorflow::createSession(graphDef);
 
             //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
-            nInputs = 67; 
+            inputFeatures = std::vector<std::string>{'h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E'};
+
+            nInputs = sizeof(inputFeatures); 
             fixRotate = true;
             means = std::vector<double>{1.51975727e+02,  7.52654900e+01,  8.01863353e+01,  6.65015349e-01,
                 5.39720100e-01,  2.16281726e+00,  3.47394597e+02,  1.46177934e+02,
@@ -246,25 +250,25 @@ class DnnMvaVariables : public MvaVariablesBase {
             svFit_p4.SetPxPyPzE(eventbase.GetHiggsTTMomentum(true).Px(), eventbase.GetHiggsTTMomentum(true).Py(), eventbase.GetHiggsTTMomentum(true).Pz(), eventbase.GetHiggsTTMomentum(true).E());
 
             //b-jet info
-            double b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
-            double b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
-            double b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
+            features["b_0_csv"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
+            features["b_0_rawf"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
+            features["b_0_mva"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
 
-            double b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
-            double b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
-            double b_1_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
+            features["b_1_csv"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
+            features["b_1_rawf"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
+            features["b_1_mva"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
 
             //Order jets by pT
             if (bjet0_p4.Pt() < bjet1_p4.Pt()) {
                 bjet0_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum().E());
-                b_0_csv = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
-                b_0_rawf = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
-                b_0_mva = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
+                features["b_0_csv"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
+                features["b_0_rawf"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
+                features["b_0_mva"] = static_cast<double>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
 
                 bjet1_p4.SetPxPyPzE(eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Px(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Py(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().Pz(), eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum().E());
-                b_1_csv = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
-                b_1_rawf = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
-                b_1_mva = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
+                features["b_1_csv"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
+                features["b_1_rawf"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
+                features["b_1_mva"] = static_cast<double>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
             }
 
             //Rotate event to have t_0 at phi=0
@@ -282,91 +286,96 @@ class DnnMvaVariables : public MvaVariablesBase {
             TLorentzVector hh_p4 = hbb_p4+htt_p4;
 
             //Global info
-            double nJets = static_cast<double>(eventbase.GetNJets());
+            features["nJets"] = static_cast<double>(eventbase.GetNJets());
             double hT_jets = 0;
             for (const JetCandidate& jet : eventbase.GetJets()) {
                 hT_jets += jet.GetMomentum().Et();
             }
+            features["hT_jets"]
 
             //MET
-            double met_px = met_p4.Px();
-            double met_py = met_p4.Py();
-            double met_pT = met_p4.Pt();
+            features["met_px"] = met_p4.Px();
+            features["met_py"] = met_p4.Py();
+            features["met_pT"] = met_p4.Pt();
 
             //Taus
-            double t_0_px = t_0_p4.Px();
-            double t_0_py = t_0_p4.Py();
-            double t_0_pz = t_0_p4.Pz();
-            double t_0_P = t_0_p4.P();
-            double t_0_E = t_0_p4.E();
-            double t_0_mass = t_0_p4.M();
-            double t_0_mT = Calculate_MT(t_0_p4, met_p4);
+            features["t_0_px"] = t_0_p4.Px();
+            features["t_0_py"] = t_0_p4.Py();
+            features["t_0_pz"] = t_0_p4.Pz();
+            features["t_0_P"] = t_0_p4.P();
+            features["t_0_E"] = t_0_p4.E();
+            features["t_0_mass"] = t_0_p4.M();
+            features["t_0_mT"] = Calculate_MT(t_0_p4, met_p4);
 
-            double t_1_px = t_1_p4.Px();
-            double t_1_py = t_1_p4.Py();
-            double t_1_pz = t_1_p4.Pz();
-            double t_1_P = t_1_p4.P();
-            double t_1_E = t_1_p4.E();
-            double t_1_mass = t_1_p4.M();
-            double t_1_mT = Calculate_MT(t_1_p4, met_p4);
+            features["t_1_px"] = t_1_p4.Px();
+            features["t_1_py"] = t_1_p4.Py();
+            features["t_1_pz"] = t_1_p4.Pz();
+            features["t_1_P"] = t_1_p4.P();
+            features["t_1_E"] = t_1_p4.E();
+            features["t_1_mass"] = t_1_p4.M();
+            features["t_1_mT"] = Calculate_MT(t_1_p4, met_p4);
 
             //Jets
-            double b_0_px = bjet0_p4.Px();
-            double b_0_py = bjet0_p4.Py();
-            double b_0_pz = bjet0_p4.Pz();
-            double b_0_P = bjet0_p4.P();
-            double b_0_E = bjet0_p4.E();
-            double b_0_mass = bjet0_p4.M();
+            features["b_0_px"] = bjet0_p4.Px();
+            features["b_0_py"] = bjet0_p4.Py();
+            features["b_0_pz"] = bjet0_p4.Pz();
+            features["b_0_P"] = bjet0_p4.P();
+            features["b_0_E"] = bjet0_p4.E();
+            features["b_0_mass"] = bjet0_p4.M();
 
-            double b_1_px = bjet1_p4.Px();
-            double b_1_py = bjet1_p4.Py();
-            double b_1_pz = bjet1_p4.Pz();
-            double b_1_P = bjet1_p4.P();
-            double b_1_E = bjet1_p4.E();
-            double b_1_mass = bjet1_p4.M();
+            features["b_1_px"] = bjet1_p4.Px();
+            features["b_1_py"] = bjet1_p4.Py();
+            features["b_1_pz"] = bjet1_p4.Pz();
+            features["b_1_P"] = bjet1_p4.P();
+            features["b_1_E"] = bjet1_p4.E();
+            features["b_1_mass"] = bjet1_p4.M();
 
             //SVFit
-            double h_tt_svFit_px = svFit_p4.Px();
-            double h_tt_svFit_py = svFit_p4.Py();
-            double h_tt_svFit_pz = svFit_p4.Pz();
-            double h_tt_svFit_P = svFit_p4.P();
-            double h_tt_svFit_E = svFit_p4.E();
-            double h_tt_svFit_mass = svFit_p4.M();
-            double h_tt_svFit_mT = Calculate_MT(eventbase.GetHiggsTTMomentum(true), eventbase.GetMET().GetMomentum());
+            features["h_tt_svFit_px"] = svFit_p4.Px();
+            features["h_tt_svFit_py"] = svFit_p4.Py();
+            features["h_tt_svFit_pz"] = svFit_p4.Pz();
+            features["h_tt_svFit_P"] = svFit_p4.P();
+            features["h_tt_svFit_E"] = svFit_p4.E();
+            features["h_tt_svFit_mass"] = svFit_p4.M();
+            features["h_tt_svFit_mT"] = Calculate_MT(eventbase.GetHiggsTTMomentum(true), eventbase.GetMET().GetMomentum());
 
             //KinFit
-            double diH_kinFit_mass = static_cast<double>(eventbase.GetKinFitResults().mass);
-            double diH_kinFit_chi2 = static_cast<double>(eventbase.GetKinFitResults().chi2);
-            double diH_kinFit_conv = static_cast<double>(eventbase.GetKinFitResults().convergence);
+            features["diH_kinFit_mass"] = static_cast<double>(eventbase.GetKinFitResults().mass);
+            features["diH_kinFit_chi2"] = static_cast<double>(eventbase.GetKinFitResults().chi2);
+            features["diH_kinFit_conv"] = static_cast<double>(eventbase.GetKinFitResults().convergence);
 
             //h->bb
-            double h_bb_px = hbb_p4.Px();
-            double h_bb_py = hbb_p4.Py();
-            double h_bb_pz = hbb_p4.Pz();
-            double h_bb_P = hbb_p4.P();
-            double h_bb_E = hbb_p4.E();
-            double h_bb_mass = hbb_p4.M();
+            features["h_bb_px"] = hbb_p4.Px();
+            features["h_bb_py"] = hbb_p4.Py();
+            features["h_bb_pz"] = hbb_p4.Pz();
+            features["h_bb_P"] = hbb_p4.P();
+            features["h_bb_E"] = hbb_p4.E();
+            features["h_bb_mass"] = hbb_p4.M();
 
             //h->tautau
-            double h_tt_px = htt_p4.Px();
-            double h_tt_py = htt_p4.Py();
-            double h_tt_pz = htt_p4.Pz();
-            double h_tt_P = htt_p4.P();
-            double h_tt_E = htt_p4.E();
-            double h_tt_mass = htt_p4.M();
+            features["h_tt_px"] = htt_p4.Px();
+            features["h_tt_py"] = htt_p4.Py();
+            features["h_tt_pz"] = htt_p4.Pz();
+            features["h_tt_P"] = htt_p4.P();
+            features["h_tt_E"] = htt_p4.E();
+            features["h_tt_mass"] = htt_p4.M();
 
             //Di-higgs
-            double diH_px = hh_p4.Px();
-            double diH_py = hh_p4.Py();
-            double diH_pz = hh_p4.Pz();
-            double diH_P = hh_p4.P();
-            double diH_E = hh_p4.E();
-            double diH_mass = hh_p4.M();
+            features["diH_px"] = hh_p4.Px();
+            features["diH_py"] = hh_p4.Py();
+            features["diH_pz"] = hh_p4.Pz();
+            features["diH_P"] = hh_p4.P();
+            features["diH_E"] = hh_p4.E();
+            features["diH_mass"] = hh_p4.M();
 
             //Shapes__________________________
             double hT, sT, centrality, eVis;
             getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
+            features["hT"]
+            features["sT"]
+            features["centrality"]
+            features["eVis"]
 
             double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
@@ -377,28 +386,42 @@ class DnnMvaVariables : public MvaVariablesBase {
                 &upsilon, &dShape,
                 &sphericityEigen0, &sphericityEigen1, &sphericityEigen2,
                 &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
+            features["sphericity"]
+            features["spherocity"]
+            features["aplanarity"]
+            features["aplanority"]
+            features["upsilon"]
+            features["dShape"]
+            features["sphericityEigen0"]
+            features["sphericityEigen1"]
+            features["sphericityEigen2"]
+            features["spherocityEigen0"]
+            features["spherocityEigen1"]
+            features["spherocityEigen2"]
 
             //Twist___________________________
-            double twist_b_0_b_1 = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
-            double twist_b_0_t_0 = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
-            double twist_b_0_t_1 = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
-            double twist_b_1_t_0 = atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta())));
-            double twist_b_1_t_1 = atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta())));
-            double twist_t_0_t_1 = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
-            double twist_h_bb_h_tt = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
+            features["twist_b_0_b_1"] = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
+            features["twist_b_0_t_0"] = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
+            features["twist_b_0_t_1"] = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
+            features["twist_b_1_t_0"] = atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta())));
+            features["twist_b_1_t_1"] = atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta())));
+            features["twist_t_0_t_1"] = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
+            features["twist_h_bb_h_tt"] = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
 
             //dR__________________________________
-            double dR_b_0_b_1 = DeltaR(bjet0_p4, bjet1_p4);
-            double dR_b_0_t_0 = DeltaR(bjet0_p4, t_0_p4);
-            double dR_b_0_t_1 = DeltaR(bjet0_p4, t_1_p4);
-            double dR_b_1_t_0 = DeltaR(bjet1_p4, t_0_p4);
-            double dR_b_1_t_1 = DeltaR(bjet1_p4, t_1_p4);
-            double dR_t_0_t_1 = DeltaR(t_0_p4, t_1_p4);
-            double dR_h_bb_h_tt = DeltaR(hbb_p4, htt_p4);
+            features["dR_b_0_b_1"] = DeltaR(bjet0_p4, bjet1_p4);
+            features["dR_b_0_t_0"] = DeltaR(bjet0_p4, t_0_p4);
+            features["dR_b_0_t_1"] = DeltaR(bjet0_p4, t_1_p4);
+            features["dR_b_1_t_0"] = DeltaR(bjet1_p4, t_0_p4);
+            features["dR_b_1_t_1"] = DeltaR(bjet1_p4, t_1_p4);
+            features["dR_t_0_t_1"] = DeltaR(t_0_p4, t_1_p4);
+            features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);
 
-            //['h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E']
-            
-            size_t i = 0; //Todo: find better way of including features
+            for (size_t i = 0; i < nInputs; i++) { //Load selected input features into tensor with standardisation and nromalisation
+                input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
+            }
+  
+            /*size_t i = 0; //Todo: find better way of including features
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_mass - means[i])/scales[i]); i++;
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_1_mT - means[i])/scales[i]); i++;
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_kinFit_chi2 - means[i])/scales[i]); i++;
@@ -465,7 +488,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_b_0_t_0 - means[i])/scales[i]); i++;
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_mass - means[i])/scales[i]); i++;
             input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((aplanarity - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_E - means[i])/scales[i]); i++;
+            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_E - means[i])/scales[i]); i++;*/
         }
 
         double Evaluate() override {
