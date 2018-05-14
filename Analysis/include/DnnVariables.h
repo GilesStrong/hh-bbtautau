@@ -19,7 +19,7 @@ class DnnMvaVariables : public MvaVariablesBase {
     private:
         std::shared_ptr<tensorflow::GraphDef> graphDef;
         std::shared_ptr<tensorflow::Session> session;
-        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
+        tensorflow::Tensor input(DT_FLOAT, {1, nInputs});
         std::vector<tensorflow::Tensor> outputs;
 
         //Model config options //Todo: add way of changing this from config file
@@ -250,7 +250,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             if (bjet0_p4.Pt() < bjet1_p4.Pt()) {
                 bjet0_p4 = eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum();
                 b_0_csv = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
-                b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf())
+                b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
                 b_0_mva = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
 
                 bjet1_p4 = eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum();
