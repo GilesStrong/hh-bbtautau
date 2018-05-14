@@ -231,7 +231,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             using namespace ROOT::Math::VectorUtil;
 
             TLorentzVector t_0_p4, t_1_p4, bjet0_p4, bjet1_p4, met_p4, svFit_p4, hbb_p4, htt_p4, hh_p4;
-            t_0_p4.SetPxPyPzE((*eventbase.GetLeg(2).GetMomentum()).Px(), (*eventbase.GetLeg(2).GetMomentum()).Py(), (*eventbase.GetLeg(2).GetMomentum()).Pz(), (*eventbase.GetLeg(2).GetMomentum()).E()); //Todo: Check ordering
+            t_0_p4.SetPxPyPzE(eventbase.GetLeg(2).GetMomentum().Px(), eventbase.GetLeg(2).GetMomentum().Py(), eventbase.GetLeg(2).GetMomentum().Pz(), eventbase.GetLeg(2).GetMomentum().E()); //Todo: Check ordering
             t_1_p4.SetPxPyPzE((*eventbase.GetLeg(1).GetMomentum()).Px(), (*eventbase.GetLeg(1).GetMomentum()).Py(), (*eventbase.GetLeg(1).GetMomentum()).Pz(), (*eventbase.GetLeg(1).GetMomentum()).E());
             bjet0_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).E());
             bjet1_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).E());
