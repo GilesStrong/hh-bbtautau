@@ -9,23 +9,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
-#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
-#include "tensorflow/core/framework/allocation_description.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                  
-#include "tensorflow/core/framework/allocator.h"
-#include "tensorflow/core/framework/tensor.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                                  
-#include "tensorflow/core/framework/tensor_description.pb.h"  // TODO(b/62899350): Remove                                                                                                                                                      
-#include "tensorflow/core/framework/tensor_shape.h"
-#include "tensorflow/core/framework/tensor_types.h"
-#include "tensorflow/core/framework/types.h"
-#include "tensorflow/core/framework/types.pb.h"
-#include "tensorflow/core/lib/core/refcount.h"
-#include "tensorflow/core/lib/core/status.h"
-#include "tensorflow/core/lib/core/stringpiece.h"
-#include "tensorflow/core/lib/gtl/inlined_vector.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tensorflow/core/platform/macros.h"
-#include "tensorflow/core/platform/types.h"
-
 namespace analysis {
 namespace mva_study{
 
@@ -33,57 +16,64 @@ class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
 
     private:
-        //Model config options //Todo: add way of changing this from config file
-        int nInputs = 67; 
-        bool fixRotate = true;
-        std::vector<double> means{1.51975727e+02,  7.52654900e+01,  8.01863353e+01,  6.65015349e-01,
-                                5.39720100e-01,  2.16281726e+00,  3.47394597e+02,  1.46177934e+02,
-                               -3.43958888e+01,  2.40596679e+02,  1.74137283e+02, -6.14251191e+00,
-                                1.22171427e+00,  6.06015127e+01,  2.30166669e+00,  9.02781997e-03,
-                                1.12850970e+02,  7.57175906e-01,  2.74846897e-02,  8.09292578e+01,
-                               -5.57591636e+00,  2.58883688e+01,  6.02842410e+01,  7.32292869e+01,
-                                1.06671012e+02,  5.82524521e+00,  6.00731750e+01,  2.27961314e+00,
-                                7.50997040e+01, -2.69267843e-02,  9.86679103e+01,  4.13776832e+02,
-                                7.32370268e+01,  6.45864637e-01, -9.15165277e-02,  1.99685160e+02,
-                                1.33796957e+01, -5.26061143e-02,  1.02232670e+00,  3.89103972e-02,
-                                7.33541062e-01,  9.05896742e-01, -6.45897434e-02, -2.88199642e+01,
-                                2.77083011e+00,  2.98825635e-02,  3.76297981e+02,  2.47004615e+02,
-                                1.06422319e+00,  8.92801863e+01,  1.12190555e+00,  2.26928485e+00,
-                                9.62177250e-01,  2.27978916e+00,  1.72749791e+02,  9.49644769e-01,
-                                2.44739771e-01,  1.45322584e-01,  2.16866152e+02,  9.49022483e-01,
-                                8.97469292e+01,  1.03336092e-01,  2.25481780e+00,  1.05431104e+00,
-                                7.96081071e+00,  2.29148069e-02,  2.62496733e+02};
-
-        std::vector<double> scales{1.84480552e+02, 5.64743918e+01, 1.80491078e+02, 7.21862605e-01,
-                               1.08463901e+00, 8.57375541e-01, 2.27266132e+02, 1.31747969e+02,
-                               8.95539784e+01, 1.69815686e+02, 8.14561298e+01, 4.03259743e+01,
-                               1.29212491e+00, 3.81177567e+01, 9.22236194e-01, 3.47127055e+01,
-                               1.18240870e+02, 4.58208898e-01, 5.52398357e+01, 8.40699433e+01,
-                               4.26822937e+01, 8.35897838e+01, 9.44174935e+01, 6.35768731e+01,
-                               1.35527961e+02, 7.11098780e+01, 4.41501829e+01, 8.35063799e-01,
-                               5.24411617e+01, 4.39083518e+01, 7.76575987e+01, 2.01006996e+02,
-                               6.35740948e+01, 1.98028092e-01, 7.44401763e+01, 1.89707773e+02,
-                               8.84189848e+00, 7.23776750e+01, 3.96959030e-01, 6.88636135e+01,
-                               5.35210934e-01, 2.96898577e-01, 7.98386587e+01, 9.37883619e+01,
-                               7.89903627e-01, 5.74412042e+01, 2.03471762e+02, 1.20611261e+02,
-                               3.81936160e-01, 8.51928247e+01, 3.54703184e-01, 8.34483299e-01,
-                               7.14557639e-02, 8.45458138e-01, 1.71230964e+02, 4.14316855e-01,
-                               1.06994848e+02, 1.17839679e-01, 2.43664536e+02, 4.96963604e-02,
-                               8.51913718e+01, 2.90527885e-02, 8.45313249e-01, 3.86712450e-01,
-                               4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
+        int nInputs; 
+        bool fixRotate;
+        std::vector<double> means;
+        std::vector<double> scales;
 
         tensorflow::GraphDef* graphDef;  
         tensorflow::Session* session;
-        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
+        tensorflow::Tensor input;
         std::vector<tensorflow::Tensor> outputs;
 
     public:
         DnnMvaVariables(const std::string& model) {
             /*Model = name and location of models to be loaded, without .pb*/
 
-            //Todo: add loading of config file with features, preprop settings, etc.
+            //Todo: add loading of config file
             graphDef = tensorflow::loadGraphDef(model + ".pb");
             session = tensorflow::createSession(graphDef);
+
+            //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
+            nInputs = 67; 
+            fixRotate = true;
+            means{1.51975727e+02,  7.52654900e+01,  8.01863353e+01,  6.65015349e-01,
+                5.39720100e-01,  2.16281726e+00,  3.47394597e+02,  1.46177934e+02,
+                -3.43958888e+01,  2.40596679e+02,  1.74137283e+02, -6.14251191e+00,
+                1.22171427e+00,  6.06015127e+01,  2.30166669e+00,  9.02781997e-03,
+                1.12850970e+02,  7.57175906e-01,  2.74846897e-02,  8.09292578e+01,
+                -5.57591636e+00,  2.58883688e+01,  6.02842410e+01,  7.32292869e+01,
+                1.06671012e+02,  5.82524521e+00,  6.00731750e+01,  2.27961314e+00,
+                7.50997040e+01, -2.69267843e-02,  9.86679103e+01,  4.13776832e+02,
+                7.32370268e+01,  6.45864637e-01, -9.15165277e-02,  1.99685160e+02,
+                1.33796957e+01, -5.26061143e-02,  1.02232670e+00,  3.89103972e-02,
+                7.33541062e-01,  9.05896742e-01, -6.45897434e-02, -2.88199642e+01,
+                2.77083011e+00,  2.98825635e-02,  3.76297981e+02,  2.47004615e+02,
+                1.06422319e+00,  8.92801863e+01,  1.12190555e+00,  2.26928485e+00,
+                9.62177250e-01,  2.27978916e+00,  1.72749791e+02,  9.49644769e-01,
+                2.44739771e-01,  1.45322584e-01,  2.16866152e+02,  9.49022483e-01,
+                8.97469292e+01,  1.03336092e-01,  2.25481780e+00,  1.05431104e+00,
+                7.96081071e+00,  2.29148069e-02,  2.62496733e+02};
+
+            scales{1.84480552e+02, 5.64743918e+01, 1.80491078e+02, 7.21862605e-01,
+                   1.08463901e+00, 8.57375541e-01, 2.27266132e+02, 1.31747969e+02,
+                   8.95539784e+01, 1.69815686e+02, 8.14561298e+01, 4.03259743e+01,
+                   1.29212491e+00, 3.81177567e+01, 9.22236194e-01, 3.47127055e+01,
+                   1.18240870e+02, 4.58208898e-01, 5.52398357e+01, 8.40699433e+01,
+                   4.26822937e+01, 8.35897838e+01, 9.44174935e+01, 6.35768731e+01,
+                   1.35527961e+02, 7.11098780e+01, 4.41501829e+01, 8.35063799e-01,
+                   5.24411617e+01, 4.39083518e+01, 7.76575987e+01, 2.01006996e+02,
+                   6.35740948e+01, 1.98028092e-01, 7.44401763e+01, 1.89707773e+02,
+                   8.84189848e+00, 7.23776750e+01, 3.96959030e-01, 6.88636135e+01,
+                   5.35210934e-01, 2.96898577e-01, 7.98386587e+01, 9.37883619e+01,
+                   7.89903627e-01, 5.74412042e+01, 2.03471762e+02, 1.20611261e+02,
+                   3.81936160e-01, 8.51928247e+01, 3.54703184e-01, 8.34483299e-01,
+                   7.14557639e-02, 8.45458138e-01, 1.71230964e+02, 4.14316855e-01,
+                   1.06994848e+02, 1.17839679e-01, 2.43664536e+02, 4.96963604e-02,
+                   8.51913718e+01, 2.90527885e-02, 8.45313249e-01, 3.86712450e-01,
+                   4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
+
+            input(tensorflow::DT_FLOAT, {1, nInputs});
         }
 
         ~DnnMvaVariables() override {
