@@ -16,8 +16,8 @@ class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
 
     private:
-        std::shared_ptr<tensorflow::GraphDef> graphDef;
-        std::shared_ptr<tensorflow::Session> session;
+        tensorflow::GraphDef* graphDef;
+        tensorflow::Session* session;
         tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
         std::vector<tensorflow::Tensor> outputs;
 
@@ -226,36 +226,33 @@ class DnnMvaVariables : public MvaVariablesBase {
 
         void AddEvent(analysis::EventInfoBase& eventbase,
             const SampleId& mass , int spin, double sample_weight = 1., int which_test = -1) override {
+            /*Load event features into input tensor*/
+
             using namespace ROOT::Math::VectorUtil;
 
-            const auto& htt_vis_p4 = eventbase.GetHiggsTTMomentum(false);
-            const auto& svFit_p4 = eventbase.GetHiggsTTMomentum(true);
-            const auto& t_1_p4 = eventbase.GetLeg(1).GetMomentum(); //Todo: Check ordering
-            const auto& t_0_p4 = eventbase.GetLeg(2).GetMomentum();
-
-            const auto& hbb_p4 = eventbase.GetHiggsBB().GetMomentum();
-            const auto& bjet0_p4 = eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum();
-            const auto& bjet1_p4 = eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum();
-
-            const auto& met_p4 = eventbase.GetMET().GetMomentum();
+            TLorentzVector t_0_p4, t_1_p4, bjet0_p4, bjet1_p4, met_p4, svFit_p4, hbb_p4, htt_p4, hh_p4;
+            t_0_p4.SetPxPyPzE((*eventbase.GetLeg(2).GetMomentum()).Px(), (*eventbase.GetLeg(2).GetMomentum()).Py(), (*eventbase.GetLeg(2).GetMomentum()).Pz(), (*eventbase.GetLeg(2).GetMomentum()).E()); //Todo: Check ordering
+            t_1_p4.SetPxPyPzE((*eventbase.GetLeg(1).GetMomentum()).Px(), (*eventbase.GetLeg(1).GetMomentum()).Py(), (*eventbase.GetLeg(1).GetMomentum()).Pz(), (*eventbase.GetLeg(1).GetMomentum()).E());
+            bjet0_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).E());
+            bjet1_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).E());
+            met_p4.SetPxPyPzE((*eventbase.GetMET().GetMomentum()).Px(), (*eventbase.GetMET().GetMomentum()).Py(), (*eventbase.GetMET().GetMomentum()).Pz(), (*eventbase.GetMET().GetMomentum()).E());
+            svFit_p4.SetPxPyPzE((*eventbase.GetHiggsTTMomentum(true)).Px(), (*eventbase.GetHiggsTTMomentum(true)).Py(), (*eventbase.GetHiggsTTMomentum(true)).Pz(), (*eventbase.GetHiggsTTMomentum(true)).E());
 
             //b-jet info
             float b_0_csv = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
             float b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
             float b_0_mva = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
-
             float b_1_csv = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
             float b_1_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
             float b_1_mva = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
 
             //Order jets by pT
             if (bjet0_p4.Pt() < bjet1_p4.Pt()) {
-                bjet0_p4 = eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum();
+                bjet0_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetSecondDaughter().GetMomentum()).E());
                 b_0_csv = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->csv());
                 b_0_rawf = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->rawf());
                 b_0_mva = static_cast<float>(eventbase.GetHiggsBB().GetSecondDaughter()->mva());
-
-                bjet1_p4 = eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum();
+                bjet1_p4.SetPxPyPzE((*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Px(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Py(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).Pz(), (*eventbase.GetHiggsBB().GetFirstDaughter().GetMomentum()).E());
                 b_1_csv = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->csv());
                 b_1_rawf = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->rawf());
                 b_1_mva = static_cast<float>(eventbase.GetHiggsBB().GetFirstDaughter()->mva());
@@ -271,82 +268,90 @@ class DnnMvaVariables : public MvaVariablesBase {
                 t_1_p4.SetPhi(0);
             }
 
+            hbb_p4 = bjet0_p4+bjet1_p4;
+            htt_p4 = t_0_p4+t_1_p4+met_p4;
+            hh_p4 = hbb_p4+htt_p4;
+
+            //Global info
+            nJets = static_cast<float>(*eventbase.GetNJets()); //Todo: check these names
+            hT_jets = static_cast<float>(*eventbase.hT_jets()); //Todo: check these names
+
             //MET
-            float met_px = static_cast<float>(met_p4.Px());
-            float met_py = static_cast<float>(met_p4.Py());
-            float met_pT = static_cast<float>(met_p4.Pt());
+            float met_px = met_p4.Px();
+            float met_py = met_p4.Py();
+            float met_pT = met_p4.Pt();
 
             //Taus
-            float t_0_px = static_cast<float>(t_0_p4.Px());
-            float t_0_py = static_cast<float>(t_0_p4.Py());
-            float t_0_pz = static_cast<float>(t_0_p4.Pz());
-            float t_0_P = static_cast<float>(t_0_p4.P());
-            float t_0_E = static_cast<float>(t_0_p4.E());
-            float t_0_mass = static_cast<float>(t_0_p4.M());
-            float t_0_mT = static_cast<float>(Calculate_MT(t_0_p4, met_p4));
+            float t_0_px = t_0_p4.Px();
+            float t_0_py = t_0_p4.Py();
+            float t_0_pz = t_0_p4.Pz();
+            float t_0_P = t_0_p4.P();
+            float t_0_E = t_0_p4.E();
+            float t_0_mass = t_0_p4.M();
+            float t_0_mT = Calculate_MT(t_0_p4, met_p4);
 
-            float t_1_px = static_cast<float>(t_1_p4.Px());
-            float t_1_py = static_cast<float>(t_1_p4.Py());
-            float t_1_pz = static_cast<float>(t_1_p4.Pz());
-            float t_1_P = static_cast<float>(t_1_p4.P());
-            float t_1_E = static_cast<float>(t_1_p4.E());
-            float t_1_mass = static_cast<float>(t_1_p4.M());
-            float t_1_mT = static_cast<float>(Calculate_MT(t_1_p4, met_p4));
+            float t_1_px = t_1_p4.Px();
+            float t_1_py = t_1_p4.Py();
+            float t_1_pz = t_1_p4.Pz();
+            float t_1_P = t_1_p4.P();
+            float t_1_E = t_1_p4.E();
+            float t_1_mass = t_1_p4.M();
+            float t_1_mT = Calculate_MT(t_1_p4, met_p4);
 
             //Jets
-            float b_0_px = static_cast<float>(bjet0_p4.Px());
-            float b_0_py = static_cast<float>(bjet0_p4.Py());
-            float b_0_pz = static_cast<float>(bjet0_p4.Pz());
-            float b_0_P = static_cast<float>(bjet0_p4.P());
-            float b_0_E = static_cast<float>(bjet0_p4.E());
-            float b_0_mass = static_cast<float>(bjet0_p4.M());
+            float b_0_px = bjet0_p4.Px();
+            float b_0_py = bjet0_p4.Py();
+            float b_0_pz = bjet0_p4.Pz();
+            float b_0_P = bjet0_p4.P();
+            float b_0_E = bjet0_p4.E();
+            float b_0_mass = bjet0_p4.M();
 
-            float b_1_px = static_cast<float>(bjet1_p4.Px());
-            float b_1_py = static_cast<float>(bjet1_p4.Py());
-            float b_1_pz = static_cast<float>(bjet1_p4.Pz());
-            float b_1_P = static_cast<float>(bjet1_p4.P());
-            float b_1_E = static_cast<float>(bjet1_p4.E());
-            float b_1_mass = static_cast<float>(bjet1_p4.M());
+            float b_1_px = bjet1_p4.Px();
+            float b_1_py = bjet1_p4.Py();
+            float b_1_pz = bjet1_p4.Pz();
+            float b_1_P = bjet1_p4.P();
+            float b_1_E = bjet1_p4.E();
+            float b_1_mass = bjet1_p4.M();
 
             //SVFit
-            float h_tt_svFit_px = static_cast<float>(svFit_p4.Px());
-            float h_tt_svFit_py = static_cast<float>(svFit_p4.Py());
-            float h_tt_svFit_pz = static_cast<float>(svFit_p4.Pz());
-            float h_tt_svFit_P = static_cast<float>(svFit_p4.P());
-            float h_tt_svFit_E = static_cast<float>(svFit_p4.E());
-            float h_tt_svFit_mass = static_cast<float>(svFit_p4.M());
-            float h_tt_svFit_mT = static_cast<float>(alculate_MT(Htt_sv, met));
+            float h_tt_svFit_px = svFit_p4.Px();
+            float h_tt_svFit_py = svFit_p4.Py();
+            float h_tt_svFit_pz = svFit_p4.Pz();
+            float h_tt_svFit_P = svFit_p4.P();
+            float h_tt_svFit_E = svFit_p4.E();
+            float h_tt_svFit_mass = svFit_p4.M();
+            float h_tt_svFit_mT = alculate_MT(Htt_sv, met);
 
             //KinFit
-            float diH_kinFit_mass = static_cast<float>(eventbase.GetKinFitResults().mass);
-            float diH_kinFit_chi2 = static_cast<float>(eventbase.GetKinFitResults().chi2);
-            float diH_kinFit_conv = static_cast<float>(eventbase.GetKinFitResults().conv);
+            float diH_kinFit_mass = eventbase.GetKinFitResults().mass;
+            float diH_kinFit_chi2 = eventbase.GetKinFitResults().chi2;
+            float diH_kinFit_conv = eventbase.GetKinFitResults().conv;
 
             //h->bb
-            float h_bb_px = static_cast<float>(hbb_p4.Px());
-            float h_bb_py = static_cast<float>(hbb_p4.Py());
-            float h_bb_pz = static_cast<float>(hbb_p4.Pz());
-            float h_bb_P = static_cast<float>(hbb_p4.P());
-            float h_bb_E = static_cast<float>(hbb_p4.E());
-            float h_bb_mass = static_cast<float>(hbb_p4.M());
+            float h_bb_px = hbb_p4.Px();
+            float h_bb_py = hbb_p4.Py();
+            float h_bb_pz = hbb_p4.Pz();
+            float h_bb_P = hbb_p4.P();
+            float h_bb_E = hbb_p4.E();
+            float h_bb_mass = hbb_p4.M();
 
             //h->tautau
             auto htt_p4 = htt_vis_p4+met_p4;
-            float h_tt_px = static_cast<float>(htt_p4.Px());
-            float h_tt_py = static_cast<float>(htt_p4.Py());
-            float h_tt_pz = static_cast<float>(htt_p4.Pz());
-            float h_tt_P = static_cast<float>(htt_p4.P());
-            float h_tt_E = static_cast<float>(htt_p4.E());
-            float h_tt_mass = static_cast<float>(htt_p4.M());
+            float h_tt_px = htt_p4.Px();
+            float h_tt_py = htt_p4.Py();
+            float h_tt_pz = htt_p4.Pz();
+            float h_tt_P = htt_p4.P();
+            float h_tt_E = htt_p4.E();
+            float h_tt_mass = htt_p4.M();
 
             //Di-higgs
             auto hh_p4 = hbb_p4+htt_p4;
-            float diH_px = static_cast<float>(hh_p4.Px());
-            float diH_py = static_cast<float>(hh_p4.Py());
-            float diH_pz = static_cast<float>(hh_p4.Pz());
-            float diH_P = static_cast<float>(hh_p4.P());
-            float diH_E = static_cast<float>(hh_p4.E());
-            float diH_mass = static_cast<float>(hh_p4.M());
+            float diH_px = hh_p4.Px();
+            float diH_py = hh_p4.Py();
+            float diH_pz = hh_p4.Pz();
+            float diH_P = hh_p4.P();
+            float diH_E = hh_p4.E();
+            float diH_mass = hh_p4.M();
 
             //Shapes__________________________
             float hT, sT, centrality, eVis;
@@ -364,22 +369,22 @@ class DnnMvaVariables : public MvaVariablesBase {
                 &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
 
             //Twist___________________________
-            float twist_b_0_b_1 = static_cast<float>(atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta()))));
-            float twist_b_0_t_0 = static_cast<float>(atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta()))));
-            float twist_b_0_t_1 = static_cast<float>(atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta()))));
-            float twist_b_1_t_0 = static_cast<float>(atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta()))));
-            float twist_b_1_t_1 = static_cast<float>(atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta()))));
-            float twist_t_0_t_1 = static_cast<float>(atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta()))));
-            float twist_h_bb_h_tt = static_cast<float>(atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta()))));
+            float twist_b_0_b_1 = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
+            float twist_b_0_t_0 = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
+            float twist_b_0_t_1 = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
+            float twist_b_1_t_0 = atan(std::abs(DeltaPhi(bjet1_p4, t_0_p4)/(bjet1_p4.Eta()-t_0_p4.Eta())));
+            float twist_b_1_t_1 = atan(std::abs(DeltaPhi(bjet1_p4, t_1_p4)/(bjet1_p4.Eta()-t_1_p4.Eta())));
+            float twist_t_0_t_1 = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
+            float twist_h_bb_h_tt = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
 
             //dR__________________________________
-            float dR_b_0_b_1 = static_cast<float>(DeltaR(bjet0_p4, bjet1_p4));
-            float dR_b_0_t_0 = static_cast<float>(DeltaR(bjet0_p4, t_0_p4));
-            float dR_b_0_t_1 = static_cast<float>(DeltaR(bjet0_p4, t_1_p4));
-            float dR_b_1_t_0 = static_cast<float>(DeltaR(bjet1_p4, t_0_p4));
-            float dR_b_1_t_1 = static_cast<float>(DeltaR(bjet1_p4, t_1_p4));
-            float dR_t_0_t_1 = static_cast<float>(DeltaR(t_0_p4, t_1_p4));
-            float dR_h_bb_h_tt = static_cast<float>(DeltaR(hbb_p4, htt_p4));
+            float dR_b_0_b_1 = DeltaR(bjet0_p4, bjet1_p4);
+            float dR_b_0_t_0 = DeltaR(bjet0_p4, t_0_p4);
+            float dR_b_0_t_1 = DeltaR(bjet0_p4, t_1_p4);
+            float dR_b_1_t_0 = DeltaR(bjet1_p4, t_0_p4);
+            float dR_b_1_t_1 = DeltaR(bjet1_p4, t_1_p4);
+            float dR_t_0_t_1 = DeltaR(t_0_p4, t_1_p4);
+            float dR_h_bb_h_tt = DeltaR(hbb_p4, htt_p4);
 
             //['h_tt_svFit_mass', 't_1_mT', 'diH_kinFit_chi2', 'b_0_csv', 'b_1_csv', 'dR_t_0_t_1', 'diH_kinFit_mass', 'h_bb_mass', 'h_bb_px', 'hT', 'h_tt_mass', 't_0_px', 'diH_kinFit_conv', 't_1_px', 'dR_b_0_b_1', 't_0_py', 'h_tt_svFit_mT', 't_0_mass', 'h_tt_svFit_py', 'h_tt_svFit_px', 'b_1_px', 'diH_px', 'h_tt_px', 't_0_P', 'hT_jets', 'met_px', 't_0_mT', 'dR_b_0_t_0', 'met_pT', 'b_1_py', 't_1_E', 'diH_mass', 't_0_E', 'centrality', 'h_bb_py', 'h_bb_P', 'b_0_mass', 'diH_py', 'twist_t_0_t_1', 'h_tt_py', 'b_1_mva', 'b_0_mva', 'b_0_py', 'b_0_px', 'dR_h_bb_h_tt', 'met_py', 'sT', 'h_tt_E', 'twist_b_0_t_1', 'b_1_P', 'twist_h_bb_h_tt', 'dR_b_1_t_0', 'b_1_rawf', 'dR_b_0_t_1', 'b_0_E', 'twist_b_0_b_1', 'b_1_pz', 'sphericity', 'h_tt_svFit_P', 'b_0_rawf', 'b_1_E', 't_1_mass', 'dR_b_1_t_1', 'twist_b_0_t_0', 'b_1_mass', 'aplanarity', 'h_bb_E']
             
