@@ -16,11 +16,6 @@ class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
 
     private:
-        tensorflow::GraphDef* graphDef;
-        tensorflow::Session* session;
-        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
-        std::vector<tensorflow::Tensor> outputs;
-
         //Model config options //Todo: add way of changing this from config file
         int nInputs = 67; 
         bool fixRotate = true;
@@ -59,6 +54,11 @@ class DnnMvaVariables : public MvaVariablesBase {
                                1.06994848e+02, 1.17839679e-01, 2.43664536e+02, 4.96963604e-02,
                                8.51913718e+01, 2.90527885e-02, 8.45313249e-01, 3.86712450e-01,
                                4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
+
+        tensorflow::GraphDef* graphDef;  
+        tensorflow::Session* session;
+        tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, nInputs});
+        std::vector<tensorflow::Tensor> outputs;
 
     public:
         DnnMvaVariables(const std::string& model) {
