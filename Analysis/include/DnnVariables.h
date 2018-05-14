@@ -20,7 +20,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         bool fixRotate;
         std::vector<double> means;
         std::vector<double> scales;
-        std::map<std::string, double> features
+        std::map<std::string, double> features;
         std::vector<std::string> inputFeatures;
 
         tensorflow::GraphDef* graphDef;  
