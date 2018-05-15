@@ -7,7 +7,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 #include <TMatrixT.h>
-#include <TMatrixD.h>
 #include <TMatrixDEigen.h>
 
 namespace analysis {
@@ -124,8 +123,8 @@ class DnnMvaVariables : public MvaVariablesBase {
             *centrality /= *eVis;
         }
 
-        TMatrixD decomposeVector(TLorentzVector* in) {
-            TMatrixD out(3, 3);
+        TMatrixT<double> decomposeVector(TLorentzVector* in) {
+            TMatrixT<double> out(3, 3);
             out(0, 0) = in->Px()*in->Px();
             out(0, 1) = in->Px()*in->Py();
             out(0, 2) = in->Px()*in->Pz();
@@ -138,27 +137,27 @@ class DnnMvaVariables : public MvaVariablesBase {
             return out;
         }
 
-        void appendSphericity(TMatrixD* mat, double* div, TLorentzVector* mom) {
+        void appendSphericity(TMatrixT<double>* mat, double* div, TLorentzVector* mom) {
             /*Used in calculating sphericity tensor*/
 
-            TMatrixD decomp = decomposeVector(mom);
+            TMatrixT<double> decomp = decomposeVector(mom);
             *mat += decomp;
             *div += pow(mom->P(), 2);
         }   
 
-        void appendSpherocity(TMatrixD* mat, double* div, TLorentzVector* mom) {
+        void appendSpherocity(TMatrixT<double>* mat, double* div, TLorentzVector* mom) {
             /*Used in calculating spherocity tensor*/
 
-            TMatrixD decomp = decomposeVector(mom);
+            TMatrixT<double> decomp = decomposeVector(mom);
             decomp *= 1/std::abs(mom->P());
             *mat += decomp;
             *div += std::abs(mom->P());
         }
 
-        std::vector<double> getEigenValues(TMatrixD in) {
+        std::vector<double> getEigenValues(TMatrixT<double> in) {
             /*Return vector of sorted, nomalised eigenvalues of passed matrix*/
 
-            TMatrixD eigenMatrix = TMatrixDEigen(in).GetEigenValues();
+            TMatrixT<double> eigenMatrix = TMatrixDEigen(in).GetEigenValues();
             std::vector<double> eigenValues(3);
             eigenValues[0] = eigenMatrix(0, 0);
             eigenValues[1] = eigenMatrix(1, 1);
@@ -208,7 +207,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             *spherocityEigen2 = 0;
 
             //Populate tensors
-            TMatrixD sphericityT(3, 3), spherocityT(3, 3);
+            TMatrixT<double> sphericityT(3, 3), spherocityT(3, 3);
             double sphericityD = 0, spherocityD = 0;
             appendSphericity(&sphericityT, &sphericityD, v_tau_0);
             appendSpherocity(&spherocityT, &spherocityD, v_tau_0);
