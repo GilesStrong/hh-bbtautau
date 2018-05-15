@@ -16,9 +16,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "EventAnalyzerCore.h"
 #include "NonResModel.h"
 #include "DnnVariables.h"
-#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-#include <TMatrixD.h>
-#include <TMatrixDEigen.h>
 
 namespace analysis {
 
