@@ -2,7 +2,6 @@
 This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 
 #include "Analysis/include/BaseEventAnalyzer.h"
-#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 
 namespace analysis {
 

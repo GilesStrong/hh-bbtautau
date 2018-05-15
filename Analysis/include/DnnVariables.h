@@ -420,80 +420,11 @@ class DnnMvaVariables : public MvaVariablesBase {
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
                 input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
-  
-            /*size_t i = 0; //Todo: find better way of including features
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_1_mT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_kinFit_chi2 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_csv - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_csv - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_t_0_t_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_kinFit_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((hT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_kinFit_conv - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_1_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_b_0_b_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_mT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_P - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((hT_jets - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((met_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_mT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_b_0_t_0 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((met_pT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_1_E - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_0_E - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((centrality - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_P - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((diH_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_t_0_t_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_mva - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_mva - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_px - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_h_bb_h_tt - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((met_py - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((sT - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_E - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_b_0_t_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_P - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_h_bb_h_tt - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_b_1_t_0 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_rawf - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_b_0_t_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_E - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_b_0_b_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_pz - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((sphericity - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_tt_svFit_P - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_0_rawf - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_E - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((t_1_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((dR_b_1_t_1 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((twist_b_0_t_0 - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((b_1_mass - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((aplanarity - means[i])/scales[i]); i++;
-            input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((h_bb_E - means[i])/scales[i]); i++;*/
         }
 
         double Evaluate() override {
             tensorflow::run(session, { { "input", input } }, { "output" }, &outputs);
-            return outputs[0].matrix<double>()(0, 0);
+            return outputs[0].matrix<float>()(0, 0);
         }
 
         std::shared_ptr<TMVA::Reader> GetReader() override {
