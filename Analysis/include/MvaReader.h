@@ -6,6 +6,8 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMVA/Reader.h"
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
+#include "DnnVariables.h"
+
 
 namespace analysis {
 namespace mva_study{
@@ -152,8 +154,13 @@ private:
     VarsPtr CreateMvaVariables(const std::string& method_name, const std::string&  bdt_weights,
                                const std::unordered_set<std::string>& enabled_vars, bool is_legacy, bool isLow = true)
     {
-        if (is_legacy) return std::make_shared<LegacyMvaVariables>(method_name, bdt_weights, isLow);
-        return std::make_shared<MvaVariablesEvaluation>(method_name, bdt_weights, enabled_vars);
+        if (is_legacy) {
+            return std::make_shared<LegacyMvaVariables>(method_name, bdt_weights, isLow);
+        } else if (method_name.find('dnn_') != std::string::npos) {
+            return std::make_shared<DnnMvaVariables>(method_name);
+        } else {
+            return std::make_shared<MvaVariablesEvaluation>(method_name, bdt_weights, enabled_vars);
+        }
     }
 
 private:
