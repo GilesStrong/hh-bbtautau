@@ -6,8 +6,9 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-#include <TMatrixD.h>
-#include <TMatrixDEigen.h>
+#include "TMatrixD.h"
+#include "TMatrixT.h"
+#include "TMatrixDEigen.h"
 
 namespace analysis {
 namespace mva_study{
@@ -368,7 +369,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["diH_E"] = hh_p4.E();
             features["diH_mass"] = hh_p4.M();
 
-            //Shapes__________________________
+            //Shapes
             double hT, sT, centrality, eVis;
             getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
@@ -399,7 +400,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["spherocityEigen1"] = spherocityEigen1;
             features["spherocityEigen2"] = spherocityEigen2;
 
-            //Twist___________________________
+            //Twist
             features["twist_b_0_b_1"] = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
             features["twist_b_0_t_0"] = atan(std::abs(DeltaPhi(bjet0_p4, t_0_p4)/(bjet0_p4.Eta()-t_0_p4.Eta())));
             features["twist_b_0_t_1"] = atan(std::abs(DeltaPhi(bjet0_p4, t_1_p4)/(bjet0_p4.Eta()-t_1_p4.Eta())));
@@ -408,7 +409,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["twist_t_0_t_1"] = atan(std::abs(DeltaPhi(t_0_p4, t_1_p4)/(t_0_p4.Eta()-t_1_p4.Eta())));
             features["twist_h_bb_h_tt"] = atan(std::abs(DeltaPhi(hbb_p4, htt_p4)/(hbb_p4.Eta()-htt_p4.Eta())));
 
-            //dR__________________________________
+            //dR
             features["dR_b_0_b_1"] = DeltaR(bjet0_p4, bjet1_p4);
             features["dR_b_0_t_0"] = DeltaR(bjet0_p4, t_0_p4);
             features["dR_b_0_t_1"] = DeltaR(bjet0_p4, t_1_p4);
