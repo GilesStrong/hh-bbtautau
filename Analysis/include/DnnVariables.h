@@ -236,7 +236,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         }
 
         void AddEvent(analysis::EventInfoBase& eventbase,
-            const SampleId& mass , int spin, double sample_weight = 1., int which_test = -1) override {
+            const SampleId& /*mass*/ , int /*spin*/, double /*sample_weight = 1.*/, int /*which_test = -1*/) override {
             /*Load event features into input tensor*/
 
             using namespace ROOT::Math::VectorUtil;
