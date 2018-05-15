@@ -6,10 +6,9 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "MvaVariables.h"
 #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-#include "AnalysisTools/Core/include/RootExt.h"
-/*#include "TMatrixD.h"
+#include "TMatrixD.h"
 #include "TMatrixT.h"
-#include "TMatrixDEigen.h"*/
+#include "TMatrixDEigen.h"
 
 namespace analysis {
 namespace mva_study{
