@@ -4,9 +4,8 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #pragma once
 
 #include "MvaVariables.h"
-// #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-//#include "TMatrixD.h"
+#include "TMatrixD.h"
 #include "TMatrixT.h"
 #include "TMatrixDEigen.h"
 
