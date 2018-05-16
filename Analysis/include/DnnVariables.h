@@ -9,6 +9,18 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMatrixT.h"
 #include "TMatrixDEigen.h"
 
+ #ifndef ROOT_TMatrixTBase
+ #include "TMatrixTBase.h"
+ #endif
+ #ifndef ROOT_TMatrixTUtils
+ #include "TMatrixTUtils.h"
+ #endif
+
+TMatrixT(Int_t nrows,Int_t ncols);
+TMatrixT(const TMatrixT      <Element> &another);
+TMatrixT<Element> &operator+=(const TMatrixT   <Element> &source);
+TMatrixT<Element> &operator*=(Element val);
+
 namespace analysis {
 namespace mva_study{
 
