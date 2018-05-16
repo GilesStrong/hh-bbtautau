@@ -9,8 +9,8 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMatrixT.h"
 #include "TMatrixDEigen.h"
 
-namespace analysis {
-namespace mva_study{
+//namespace analysis {
+//namespace mva_study{
 
 class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
@@ -432,5 +432,5 @@ class DnnMvaVariables : public MvaVariablesBase {
         }
 };
 
-} //mva_study
-} //analysis
+//} //mva_study
+//} //analysis
