@@ -220,23 +220,23 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["diH_mass"] = hh_p4.M();
 
             //Shapes
-            double hT, sT, centrality, eVis;
-/*            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
+/*            double hT, sT, centrality, eVis;
+            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
             features["hT"] = hT;
             features["sT"] = sT;
             features["centrality"] = centrality;
-            features["eVis"] = eVis;*/
+            features["eVis"] = eVis;
 
             double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
                 spherocityEigen0, spherocityEigen1, spherocityEigen2;
-/*            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
+            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
                 &sphericity, &spherocity,
                 &aplanarity, &aplanority,
                 &upsilon, &dShape,
                 &sphericityEigen0, &sphericityEigen1, &sphericityEigen2,
-                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);*/
+                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
             features["sphericity"] = sphericity;
             features["spherocity"] = spherocity;
             features["aplanarity"] = aplanarity;
@@ -248,7 +248,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["sphericityEigen2"] = sphericityEigen2;
             features["spherocityEigen0"] = spherocityEigen0;
             features["spherocityEigen1"] = spherocityEigen1;
-            features["spherocityEigen2"] = spherocityEigen2;
+            features["spherocityEigen2"] = spherocityEigen2;*/
 
             //Twist
             features["twist_b_0_b_1"] = atan(std::abs(DeltaPhi(bjet0_p4, bjet1_p4)/(bjet0_p4.Eta()-bjet1_p4.Eta())));
