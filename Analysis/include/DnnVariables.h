@@ -123,6 +123,9 @@ class DnnMvaVariables : public MvaVariablesBase {
             *centrality /= *eVis;
         }
 
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wundefined-func-template"
+
         TMatrixD decomposeVector(TLorentzVector* in) {
             TMatrixD out(3, 3);
             out(0, 0) = in->Px()*in->Px();
@@ -234,6 +237,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             *spherocityEigen1 = spherocityV[1];
             *spherocityEigen2 = spherocityV[2];
         }
+        #pragma clang diagnostic pop
 
         void AddEvent(analysis::EventInfoBase& eventbase,
             const SampleId& /*mass*/ , int /*spin*/, double /*sample_weight = 1.*/, int /*which_test = -1*/) override {
@@ -370,22 +374,22 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             //Shapes
             double hT, sT, centrality, eVis;
-/*            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
+            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
             features["hT"] = hT;
             features["sT"] = sT;
             features["centrality"] = centrality;
-            features["eVis"] = eVis;*/
+            features["eVis"] = eVis;
 
             double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
                 spherocityEigen0, spherocityEigen1, spherocityEigen2;
-/*            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
+            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
                 &sphericity, &spherocity,
                 &aplanarity, &aplanority,
                 &upsilon, &dShape,
                 &sphericityEigen0, &sphericityEigen1, &sphericityEigen2,
-                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);*/
+                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
             features["sphericity"] = sphericity;
             features["spherocity"] = spherocity;
             features["aplanarity"] = aplanarity;
