@@ -7,8 +7,8 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 // #include "AnalysisTools/Core/include/NumericPrimitives.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 /*#include "TMatrixD.h"
-#include "TMatrixT.h"
-#include "TMatrixDEigen.h"*/
+#include "TMatrixT.h"*/
+#include "TMatrixDEigen.h"
 
 namespace analysis {
 namespace mva_study{
