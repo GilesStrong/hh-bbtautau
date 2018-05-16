@@ -81,158 +81,9 @@ class DnnMvaVariables : public MvaVariablesBase {
         }
 
         ~DnnMvaVariables() override {
-            /*Close session and delelte model*/
+            /*Close session and delete model*/
             tensorflow::closeSession(session);
             delete graphDef;
-        }
-
-        void getGlobalEventInfo(TLorentzVector* v_tau_0, TLorentzVector* v_tau_1, TLorentzVector* v_bJet_0, TLorentzVector* v_bJet_1, TLorentzVector* v_met,
-            double*  hT, double*  sT, double* centrality, double* eVis, bool tautau=false) {
-            /*Fills referenced variables with global event information*/
-
-            //Reset variables
-            *hT = 0;
-            *sT = 0;
-            *centrality = 0;
-            *eVis = 0;
-
-            //HT
-            *hT += v_bJet_0->Et();
-            *hT += v_bJet_1->Et();
-            *hT += v_tau_0->Et();
-            if (tautau == true) {
-                *hT += v_tau_1->Et();
-            }
-
-            //ST
-            *sT += *hT;
-            if (tautau == false) {
-                *sT += v_tau_1->Pt();
-            }
-            *sT += v_met->Pt();
-
-            //Centrality
-            *eVis += v_tau_0->E();
-            *centrality += v_tau_0->Pt();
-            *eVis += v_tau_1->E();
-            *centrality += v_tau_1->Pt();
-            *eVis += v_bJet_0->E();
-            *centrality += v_bJet_0->Pt();
-            *eVis += v_bJet_1->E();
-            *centrality += v_bJet_1->Pt();
-            *centrality /= *eVis;
-        }
-
-        TMatrixD decomposeVector(TLorentzVector* in) {
-            TMatrixD out(3, 3);
-            out(0, 0) = in->Px()*in->Px();
-            out(0, 1) = in->Px()*in->Py();
-            out(0, 2) = in->Px()*in->Pz();
-            out(1, 0) = in->Py()*in->Px();
-            out(1, 1) = in->Py()*in->Py();
-            out(1, 2) = in->Py()*in->Pz();
-            out(2, 0) = in->Pz()*in->Px();
-            out(2, 1) = in->Pz()*in->Py();
-            out(2, 2) = in->Pz()*in->Pz();
-            return out;
-        }
-
-        void appendSphericity(TMatrixD* mat, double* div, TLorentzVector* mom) {
-            /*Used in calculating sphericity tensor*/
-
-            TMatrixD decomp = decomposeVector(mom);
-            *mat += decomp;
-            *div += pow(mom->P(), 2);
-        }   
-
-        void appendSpherocity(TMatrixD* mat, double* div, TLorentzVector* mom) {
-            /*Used in calculating spherocity tensor*/
-
-            TMatrixD decomp = decomposeVector(mom);
-            decomp *= 1/std::abs(mom->P());
-            *mat += decomp;
-            *div += std::abs(mom->P());
-        }
-
-        std::vector<double> getEigenValues(TMatrixD in) {
-            /*Return vector of sorted, nomalised eigenvalues of passed matrix*/
-
-            TMatrixD eigenMatrix = TMatrixDEigen(in).GetEigenValues();
-            std::vector<double> eigenValues(3);
-            eigenValues[0] = eigenMatrix(0, 0);
-            eigenValues[1] = eigenMatrix(1, 1);
-            eigenValues[2] = eigenMatrix(2, 2);
-            std::sort(eigenValues.begin(), eigenValues.end(), std::greater<double>());
-            double sum = 0;
-            for (double n : eigenValues) sum += n;
-            std::for_each(eigenValues.begin(), eigenValues.end(), [sum](double i) { return i/sum; });
-            return eigenValues;
-        }
-
-        void getEventShapes(std::vector<double> sphericityV, std::vector<double> spherocityV,
-            double* sphericity, double* spherocity,
-            double* aplanarity, double* aplanority,
-            double* upsilon, double* dShape) {
-            /*Fill referenced features with event shape information*/
-
-            *sphericity = (3/2)*(sphericityV[1]+sphericityV[2]);
-            *spherocity = (3/2)*(spherocityV[1]+spherocityV[2]);
-            *aplanarity = 3*sphericityV[2]/2;
-            *aplanority = 3*spherocityV[2]/2;
-            *upsilon = sqrt(3.0)*(sphericityV[1]-sphericityV[2])/2;
-            *dShape = 27*spherocityV[0]*spherocityV[1]*spherocityV[2];
-        }
-
-        void getPrimaryEventShapes(TLorentzVector* v_tau_0, TLorentzVector* v_tau_1,
-            TLorentzVector* v_bJet_0, TLorentzVector* v_bJet_1,
-            double* sphericity, double* spherocity,
-            double* aplanarity, double* aplanority,
-            double* upsilon, double* dShape,
-            double* sphericityEigen0, double* sphericityEigen1, double* sphericityEigen2,
-            double* spherocityEigen0, double* spherocityEigen1, double* spherocityEigen2) {
-            /*Sets values of referenced event-shape variables for final-states*/
-
-            //Reset values
-            *sphericity = 0;
-            *spherocity = 0;
-            *aplanarity = 0;
-            *aplanority = 0;
-            *upsilon = 0;
-            *dShape = 0;
-            *sphericityEigen0 = 0;
-            *sphericityEigen1 = 0;
-            *sphericityEigen2 = 0;
-            *spherocityEigen0 = 0;
-            *spherocityEigen1 = 0;
-            *spherocityEigen2 = 0;
-
-            //Populate tensors
-            TMatrixD sphericityT(3, 3), spherocityT(3, 3);
-            double sphericityD = 0, spherocityD = 0;
-            appendSphericity(&sphericityT, &sphericityD, v_tau_0);
-            appendSpherocity(&spherocityT, &spherocityD, v_tau_0);
-            appendSphericity(&sphericityT, &sphericityD, v_tau_1);
-            appendSpherocity(&spherocityT, &spherocityD, v_tau_1);
-            appendSphericity(&sphericityT, &sphericityD, v_bJet_0);
-            appendSpherocity(&spherocityT, &spherocityD, v_bJet_0);
-            appendSphericity(&sphericityT, &sphericityD, v_bJet_1);
-            appendSpherocity(&spherocityT, &spherocityD, v_bJet_1);
-            sphericityT *= 1/sphericityD;
-            spherocityT *= 1/spherocityD;
-
-            //Calculate event shapes
-            std::vector<double> sphericityV = getEigenValues(sphericityT);
-            std::vector<double> spherocityV = getEigenValues(spherocityT);
-            getEventShapes(sphericityV, spherocityV,
-                sphericity, spherocity,
-                aplanarity, aplanority,
-                upsilon, dShape);
-            *sphericityEigen0 = sphericityV[0];
-            *sphericityEigen1 = sphericityV[1];
-            *sphericityEigen2 = sphericityV[2];
-            *spherocityEigen0 = spherocityV[0];
-            *spherocityEigen1 = spherocityV[1];
-            *spherocityEigen2 = spherocityV[2];
         }
 
         void AddEvent(analysis::EventInfoBase& eventbase,
@@ -370,22 +221,22 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             //Shapes
             double hT, sT, centrality, eVis;
-            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
+/*            getGlobalEventInfo(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4, &met_p4,
                 &hT, &sT, &centrality, &eVis);
             features["hT"] = hT;
             features["sT"] = sT;
             features["centrality"] = centrality;
-            features["eVis"] = eVis;
+            features["eVis"] = eVis;*/
 
             double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
                 spherocityEigen0, spherocityEigen1, spherocityEigen2;
-            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
+/*            getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
                 &sphericity, &spherocity,
                 &aplanarity, &aplanority,
                 &upsilon, &dShape,
                 &sphericityEigen0, &sphericityEigen1, &sphericityEigen2,
-                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);
+                &spherocityEigen0, &spherocityEigen1, &spherocityEigen2);*/
             features["sphericity"] = sphericity;
             features["spherocity"] = spherocity;
             features["aplanarity"] = aplanarity;
