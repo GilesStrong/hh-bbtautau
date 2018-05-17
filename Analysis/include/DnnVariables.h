@@ -40,7 +40,15 @@ class DnnMvaVariables : public MvaVariablesBase {
             if (debug) std::cout << "Loading model:" << model + ".pb" << "\n";
             graphDef = tensorflow::loadGraphDef(model + ".pb");
             if (debug) std::cout << "Model loaded, beginning TF session\n";
+            tensorflow::SessionOptions GetSessionOptions() {
+                tensorflow::SessionOptions sessionOptions;
+                tensorflow::ConfigProto& config = sessionOptions.config;
+                config.set_intra_op_parallelism_threads(1);
+                config.set_inter_op_parallelism_threads(1);
+                return sessionOptions;
+            }
             session = tensorflow::createSession(graphDef);
+            session.reset(tensorflow::NewSession(GetSessionOptions()));
             if (debug) std::cout << "Begun TF session\n";
 
             //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
