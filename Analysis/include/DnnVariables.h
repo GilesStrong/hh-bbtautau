@@ -432,7 +432,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             if (debug) std::cout << "Event loaded, populating input tensor\n";
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
-                std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << "\n";
+                std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" << features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << "\n";
                 input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
             if (debug) std::cout << "Input tensor populated\n";
