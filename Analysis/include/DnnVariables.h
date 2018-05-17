@@ -9,8 +9,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMatrixT.h"
 #include "TMatrixDEigen.h"
 
-bool debug = true;
-
 namespace analysis {
 namespace mva_study{
 
@@ -29,6 +27,8 @@ class DnnMvaVariables : public MvaVariablesBase {
         tensorflow::Session* session;
         tensorflow::Tensor input;
         std::vector<tensorflow::Tensor> outputs;
+        
+        bool debug = true;
 
     public:
         DnnMvaVariables(const std::string& model) {
@@ -438,7 +438,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         }
 
         double Evaluate() override {
-            if (debug) std::cout << "Evaluating event\n"
+            if (debug) std::cout << "Evaluating event\n";
             tensorflow::run(session, { { "input", input } }, { "output" }, &outputs);
             if (debug) std::cout << "Event evaulated\n";
             return outputs[0].matrix<float>()(0, 0);
