@@ -9,6 +9,8 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 #include "TMatrixT.h"
 #include "TMatrixDEigen.h"
 
+bool debug = true;
+
 namespace analysis {
 namespace mva_study{
 
@@ -32,9 +34,14 @@ class DnnMvaVariables : public MvaVariablesBase {
         DnnMvaVariables(const std::string& model) {
             /*Model = name and location of models to be loaded, without .pb*/
 
+            if (debug) std::cout << "Initialising DNN class\n"
+
             //Todo: add loading of config file
+            if (debug) std::cout << "Loading model:" << model + ".pb" << "\n"
             graphDef = tensorflow::loadGraphDef(model + ".pb");
+            if (debug) std::cout << "Model loaded, beginning TF session\n"
             session = tensorflow::createSession(graphDef);
+            if (debug) std::cout << "Begun TF session\n"
 
             //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
             inputFeatures = std::vector<std::string>{"h_tt_svFit_mass", "t_1_mT", "diH_kinFit_chi2", "b_0_csv", "b_1_csv", "dR_t_0_t_1", "diH_kinFit_mass", "h_bb_mass", "h_bb_px", "hT", "h_tt_mass", "t_0_px", "diH_kinFit_conv", "t_1_px", "dR_b_0_b_1", "t_0_py", "h_tt_svFit_mT", "t_0_mass", "h_tt_svFit_py", "h_tt_svFit_px", "b_1_px", "diH_px", "h_tt_px", "t_0_P", "hT_jets", "met_px", "t_0_mT", "dR_b_0_t_0", "met_pT", "b_1_py", "t_1_E", "diH_mass", "t_0_E", "centrality", "h_bb_py", "h_bb_P", "b_0_mass", "diH_py", "twist_t_0_t_1", "h_tt_py", "b_1_mva", "b_0_mva", "b_0_py", "b_0_px", "dR_h_bb_h_tt", "met_py", "sT", "h_tt_E", "twist_b_0_t_1", "b_1_P", "twist_h_bb_h_tt", "dR_b_1_t_0", "b_1_rawf", "dR_b_0_t_1", "b_0_E", "twist_b_0_b_1", "b_1_pz", "sphericity", "h_tt_svFit_P", "b_0_rawf", "b_1_E", "t_1_mass", "dR_b_1_t_1", "twist_b_0_t_0", "b_1_mass", "aplanarity", "h_bb_E"};
@@ -78,10 +85,12 @@ class DnnMvaVariables : public MvaVariablesBase {
                    4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
 
             input = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, nInputs});
+            if (debug) std::cout << "DNN class initialised\n"
         }
 
         ~DnnMvaVariables() override {
             /*Close session and delete model*/
+            if (debug) std::cout << "Deleting DNN class\n"
             tensorflow::closeSession(session);
             delete graphDef;
         }
@@ -241,8 +250,9 @@ class DnnMvaVariables : public MvaVariablesBase {
         void AddEvent(analysis::EventInfoBase& eventbase,
             const SampleId& /*mass*/ , int /*spin*/, double /*sample_weight = 1.*/, int /*which_test = -1*/) override {
             /*Load event features into input tensor*/
-
             using namespace ROOT::Math::VectorUtil;
+
+            if (debug) std::cout << "Loading event\n"
 
             TLorentzVector t_0_p4, t_1_p4, bjet0_p4, bjet1_p4, met_p4, svFit_p4;
             t_0_p4.SetPxPyPzE(eventbase.GetLeg(2).GetMomentum().Px(), eventbase.GetLeg(2).GetMomentum().Py(), eventbase.GetLeg(2).GetMomentum().Pz(), eventbase.GetLeg(2).GetMomentum().E()); //Todo: Check ordering
@@ -420,17 +430,22 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["dR_t_0_t_1"] = DeltaR(t_0_p4, t_1_p4);
             features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);
 
+            if (debug) std::cout << "Event loaded, populating input tensor\n"
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
                 input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
+            if (debug) std::cout << "Input tensor populated\n"
         }
 
         double Evaluate() override {
+            if (debug) std::cout << "Evaluating event\n"
             tensorflow::run(session, { { "input", input } }, { "output" }, &outputs);
+            if (debug) std::cout << "Event evaulated\n"
             return outputs[0].matrix<float>()(0, 0);
         }
 
         std::shared_ptr<TMVA::Reader> GetReader() override {
+            if (debug) std::cout << "Calling for readed, returning NULPTR\n"
             return nullptr;
         }
 };
