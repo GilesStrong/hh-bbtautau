@@ -124,8 +124,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         }
 
         #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wundefined-func-template"
-
+        #pragma clang diagnostic ignored "-Wundefined-func-template" //CLang complains about TMatrixT not being explicitly defined here, not sure why.
         TMatrixD decomposeVector(TLorentzVector* in) {
             TMatrixD out(3, 3);
             out(0, 0) = in->Px()*in->Px();
