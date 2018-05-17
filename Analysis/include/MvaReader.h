@@ -155,13 +155,13 @@ private:
     {
         std::cout << "method_name: " << method_name << "bdt_weights: " << bdt_weights << "\n";
         if (is_legacy) {
-            std::cout << "legacy\n"
+            std::cout << "legacy\n";
             return std::make_shared<LegacyMvaVariables>(method_name, bdt_weights, isLow);
         } else if (method_name.find("dnn_") != std::string::npos) {
-            std::cout << "dnn\n"
+            std::cout << "dnn\n";
             return std::make_shared<DnnMvaVariables>(method_name);
         } else {
-            std::cout << "bdt\n"
+            std::cout << "bdt\n";
             return std::make_shared<MvaVariablesEvaluation>(method_name, bdt_weights, enabled_vars);
         }
     }
