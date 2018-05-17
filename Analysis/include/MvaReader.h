@@ -155,7 +155,7 @@ private:
     {
         if (is_legacy) {
             return std::make_shared<LegacyMvaVariables>(method_name, bdt_weights, isLow);
-        } else if (bdt_weights.find("dnn_") != std::string::npos) {
+        } else if (bdt_weights.find("dnn") != std::string::npos) {
             return std::make_shared<DnnMvaVariables>(bdt_weights);
         } else {
             return std::make_shared<MvaVariablesEvaluation>(method_name, bdt_weights, enabled_vars);
