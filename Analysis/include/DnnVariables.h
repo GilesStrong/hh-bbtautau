@@ -441,8 +441,8 @@ class DnnMvaVariables : public MvaVariablesBase {
         double Evaluate() override {
             int node_count = graphDef->node_size();
             for (int i = 0; i < node_count; i++) {
-                    auto n = graphDef.node(i);
-                    std::cout<<"Names : "<< n->name() <<std::endl;
+                    auto n = graphDef->node(i);
+                    std::cout<<"Names : "<< n.name() <<std::endl;
 
             }
             if (debug) std::cout << "Evaluating event\n";
