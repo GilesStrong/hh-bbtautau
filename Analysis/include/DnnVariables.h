@@ -26,7 +26,6 @@ class DnnMvaVariables : public MvaVariablesBase {
         tensorflow::GraphDef* graphDef;  
         tensorflow::Session* session;
         tensorflow::Tensor input;
-        std::vector<tensorflow::Tensor> outputs;
         
         bool debug = true;
 
@@ -432,32 +431,28 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             if (debug) std::cout << "Event loaded, populating input tensor\n";
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
-                if (debug) std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" << features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << "\n";
+                if (debug) std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" << features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << " as float: " << static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i])<< "\n";
                 input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
             if (debug) std::cout << "Input tensor populated\n";
         }
 
         double Evaluate() override {
-            int node_count = graphDef->node_size();
-            for (int i = 0; i < node_count; i++) {
-                    auto n = graphDef->node(i);
-                    std::cout<<"Names : "<< n.name() <<std::endl;
+            if (debug) {
+                int node_count = graphDef->node_size();
+                for (int i = 0; i < node_count; i++) {
+                        auto n = graphDef->node(i);
+                        std::cout<<"Names : "<< n.name() <<std::endl;
 
+                }
             }
 
-            for (size_t i = 0; i < 67; i++) std::cout << input.matrix<float>()(0, i) << "\n";
-
-            tensorflow::Tensor inputTest = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, 67}); // single batch of dimension 10                                                                                                                                                  
-            // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
-            // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
-            for (size_t i = 0; i < 67; i++) inputTest.matrix<float>()(0, i) = float(i);
-            std::vector<tensorflow::Tensor> outputsTest;
-
+            //inputTest = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, nInputs});
+            std::vector<tensorflow::Tensor> outputs;
             if (debug) std::cout << "Evaluating event\n";
-            tensorflow::run(session, { { "dense_61_input", input } }, { "output_node0" }, &outputsTest);
-            if (debug) std::cout << "Event evaulated, class prediction is: " << outputsTest[0].matrix<float>()(0, 0) << "\n";
-            return outputsTest[0].matrix<float>()(0, 0);
+            tensorflow::run(session, { { "dense_61_input", input } }, { "output_node0" }, &outputs);
+            if (debug) std::cout << "Event evaulated, class prediction is: " << outputs[0].matrix<float>()(0, 0) << "\n";
+            return outputs[0].matrix<float>()(0, 0);
         }
 
         std::shared_ptr<TMVA::Reader> GetReader() override {throw exception ("GetReader not supported.");}
