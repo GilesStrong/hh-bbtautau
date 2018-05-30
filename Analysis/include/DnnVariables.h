@@ -84,7 +84,7 @@ class DnnMvaVariables : public MvaVariablesBase {
                                         8.51913718e+01, 2.90527885e-02, 8.45313249e-01, 3.86712450e-01,
                                         4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
 
-            input = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, nInputs});
+            input = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, static_cast<int>(nInputs)});
             if (debug) std::cout << "DNN class initialised\n";
         }
 
@@ -446,14 +446,6 @@ class DnnMvaVariables : public MvaVariablesBase {
                         std::cout<<"Names : "<< n.name() <<std::endl;
 
                 }
-            }
-
-            tensorflow::Tensor inputTest = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, nInputs});
-
-            for (size_t i = 0; i < nInputs; i++) {
-                //inputTest.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
-                //inputTest.matrix<float>()(0, static_cast<Eigen::Index>(i)) = float(i);
-                inputTest.matrix<float>()(0, i) = float(i);
             }
 
             std::vector<tensorflow::Tensor> outputs;
