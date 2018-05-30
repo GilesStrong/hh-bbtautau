@@ -500,10 +500,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             return outputs[0].matrix<float>()(0, 0);
         }
 
-        std::shared_ptr<TMVA::Reader> GetReader() override {
-            if (debug) std::cout << "Calling for readed, returning NULPTR\n";
-            return nullptr;
-        }
+        std::shared_ptr<TMVA::Reader> GetReader() override {throw exception ("GetReader not supported.");}
 };
 
 } //mva_study
