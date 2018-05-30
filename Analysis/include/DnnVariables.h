@@ -28,7 +28,7 @@ void TensorflowTest() {
 
     // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
     // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
-    for (size_t i = 0; i < 10; i++) input.matrix<float>()(0, i) = float(i);
+    for (size_t i = 0; i < 67; i++) input.matrix<float>()(0, i) = float(i);
 
 
     //                                                                                                                                                                                                                                          
@@ -481,7 +481,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             if (debug) std::cout << "Event loaded, populating input tensor\n";
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
-                std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" << features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << "\n";
+                if (debug) std::cout << "Feature " << i << ": " << inputFeatures[i] << " = (" << features[inputFeatures[i]] << " - " << means[i] << ")/" << scales[i] << " = " << (features[inputFeatures[i]] - means[i])/scales[i] << "\n";
                 input.matrix<float>()(0, static_cast<Eigen::Index>(i)) = static_cast<float>((features[inputFeatures[i]] - means[i])/scales[i]);
             }
             if (debug) std::cout << "Input tensor populated\n";
@@ -495,10 +495,12 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             }
 
+            for (size_t i = 0; i < 67; i++) std::cout << input.matrix<float>()(0, i) << "\n";
+
             tensorflow::Tensor inputTest(tensorflow::DT_FLOAT, { 1, 67 }); // single batch of dimension 10                                                                                                                                                  
             // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
             // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
-            for (size_t i = 0; i < 10; i++) inputTest.matrix<float>()(0, i) = float(i);
+            for (size_t i = 0; i < 67; i++) inputTest.matrix<float>()(0, i) = float(i);
             std::vector<tensorflow::Tensor> outputsTest;
 
             if (debug) std::cout << "Evaluating event\n";
