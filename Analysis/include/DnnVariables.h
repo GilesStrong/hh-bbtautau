@@ -12,54 +12,6 @@ This file is part of https://github.com/hh-italian-group/hh-bbtautau. */
 namespace analysis {
 namespace mva_study{
 
-void TensorflowTest() {
-    std::cout << "Running standalone test of tensorflow\n";
-    // load the graph definition, i.e. an object that contains the computational graph                                                                                                                                                          
-    std::cout << "loading graph\n"   ;
-    tensorflow::GraphDef* graphDef = tensorflow::loadGraphDef("/afs/cern.ch/user/g/gstrong/di-Higgs/hh_Frameworks/CMSSW_9_4_5/src/hh-bbtautau/Analysis/config/dnn/test.pb");
-    std::cout << "Graph loaded\n";
-    // create a session                                                                                                                                                                                                                         
-    std::cout << "Beginning session\n";
-    tensorflow::Session* session = tensorflow::createSession(graphDef);
-    std::cout <<"Session begun\n";
-    // create an input tensor                                                                                                                                                                                                                   
-    std::cout << "Populating input tensor\n";
-    tensorflow::Tensor input(tensorflow::DT_FLOAT, { 1, 67 }); // single batch of dimension 10                                                                                                                                                  
-
-    // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
-    // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
-    for (size_t i = 0; i < 67; i++) input.matrix<float>()(0, i) = float(i);
-
-
-    //                                                                                                                                                                                                                                          
-    // evaluation                                                                                                                                                                                                                               
-    //                                                                                                                                                                                                                                          
-    int node_count = graphDef->node_size();
-    for (int i = 0; i < node_count; i++)
-    {
-    auto n = graphDef->node(i);
-    std::cout<<"Names : "<< n.name() <<std::endl;
-
-    }
-    std::cout << "input populated, beginning run\n";
-    std::vector<tensorflow::Tensor> outputs;
-    tensorflow::run(session, { { "dense_61_input", input } }, { "output_node0" }, &outputs);
-
-
-    //                                                                                                                                                                                                                                          
-    // process outputs                                                                                                                                                                                                                          
-    //                                                                                                                                                                                                                                          
-
-    // print the output                                                                                                                                                                                                                         
-    // -> [[float]]                                                                                                                                                                                                                             
-    std::cout << "Run finished, output is: " << outputs[0].matrix<float>()(0, 0) << std::endl;
-    // -> 46.                                                                                                                                                                                                                                   
-
-    // cleanup                                                                                                                                                                                                                                  
-    tensorflow::closeSession(session);
-    delete graphDef;
-}
-
 class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
 
@@ -80,7 +32,6 @@ class DnnMvaVariables : public MvaVariablesBase {
 
     public:
         DnnMvaVariables(const std::string& model) {
-            //TensorflowTest();
             /*Model = name and location of models to be loaded, without .pb*/
 
             if (debug) std::cout << "Initialising DNN class\n";
@@ -497,7 +448,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             for (size_t i = 0; i < 67; i++) std::cout << input.matrix<float>()(0, i) << "\n";
 
-            tensorflow::Tensor inputTest(tensorflow::DT_FLOAT, { 1, 67 }); // single batch of dimension 10                                                                                                                                                  
+            tensorflow::Tensor inputTest = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, 67}); // single batch of dimension 10                                                                                                                                                  
             // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
             // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
             for (size_t i = 0; i < 67; i++) inputTest.matrix<float>()(0, i) = float(i);
