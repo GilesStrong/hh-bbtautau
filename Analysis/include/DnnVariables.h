@@ -80,7 +80,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
     public:
         DnnMvaVariables(const std::string& model) {
-            TensorflowTest();
+            //TensorflowTest();
             /*Model = name and location of models to be loaded, without .pb*/
 
             if (debug) std::cout << "Initialising DNN class\n";
@@ -494,10 +494,17 @@ class DnnMvaVariables : public MvaVariablesBase {
                     std::cout<<"Names : "<< n.name() <<std::endl;
 
             }
+
+            tensorflow::Tensor inputTest(tensorflow::DT_FLOAT, { 1, 67 }); // single batch of dimension 10                                                                                                                                                  
+            // example: fill a single batch of the input tensor with consecutive numbers                                                                                                                                                                
+            // -> [[0, 1, 2, ...]]                                                                                                                                                                                                                      
+            for (size_t i = 0; i < 10; i++) inputTest.matrix<float>()(0, i) = float(i);
+            std::vector<tensorflow::Tensor> outputsTest;
+
             if (debug) std::cout << "Evaluating event\n";
-            tensorflow::run(session, { { "dense_61_input", input } }, { "output_node0" }, &outputs);
-            if (debug) std::cout << "Event evaulated, class prediction is: " << outputs[0].matrix<float>()(0, 0) << "\n";
-            return outputs[0].matrix<float>()(0, 0);
+            tensorflow::run(session, { { "dense_61_input", inputTest } }, { "output_node0" }, &outputsTest);
+            if (debug) std::cout << "Event evaulated, class prediction is: " << outputsTest[0].matrix<float>()(0, 0) << "\n";
+            return outputsTest[0].matrix<float>()(0, 0);
         }
 
         std::shared_ptr<TMVA::Reader> GetReader() override {throw exception ("GetReader not supported.");}
