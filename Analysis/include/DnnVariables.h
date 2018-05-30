@@ -16,7 +16,7 @@ class DnnMvaVariables : public MvaVariablesBase {
     /*Class for evaluating trained DNN stored in Tensorflow protocol buffer (.pb)*/
 
     private:
-        int nInputs; 
+        size_t nInputs; 
         bool fixRotate;
         std::vector<double> means;
         std::vector<double> scales;
@@ -27,7 +27,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         tensorflow::Session* session;
         tensorflow::Tensor input;
         
-        bool debug = true;
+        bool debug = false;
 
     public:
         DnnMvaVariables(const std::string& model) {
