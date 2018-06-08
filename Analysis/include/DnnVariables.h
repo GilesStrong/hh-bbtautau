@@ -27,7 +27,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         tensorflow::Session* session;
         tensorflow::Tensor input;
         
-        bool debug = true;
+        bool debug = false;
 
     public:
         DnnMvaVariables(const std::string& model) {
@@ -416,7 +416,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             std::vector<tensorflow::Tensor> outputs;
             if (debug) std::cout << "Evaluating event\n";
-            tensorflow::run(session, { { "inputs", input } }, { "output_node0" }, &outputs);
+            tensorflow::run(session, { { "dense_11_input", input } }, { "output_node0" }, &outputs);
             if (debug) std::cout << "Event evaulated, class prediction is: " << outputs[0].matrix<float>()(0, 0) << "\n";
             return outputs[0].matrix<float>()(0, 0);
         }
