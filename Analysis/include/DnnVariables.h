@@ -43,46 +43,12 @@ class DnnMvaVariables : public MvaVariablesBase {
             if (debug) std::cout << "Begun TF session\n";
 
             //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
-            inputFeatures = std::vector<std::string>{"h_tt_svFit_mass", "t_1_mT", "diH_kinFit_chi2", "b_0_csv", "b_1_csv", "dR_t_0_t_1", "diH_kinFit_mass", "h_bb_mass", "h_bb_px", "hT", "h_tt_mass", "t_0_px", "diH_kinFit_conv", "t_1_px", "dR_b_0_b_1", "t_0_py", "h_tt_svFit_mT", "t_0_mass", "h_tt_svFit_py", "h_tt_svFit_px", "b_1_px", "diH_px", "h_tt_px", "t_0_P", "hT_jets", "met_px", "t_0_mT", "dR_b_0_t_0", "met_pT", "b_1_py", "t_1_E", "diH_mass", "t_0_E", "centrality", "h_bb_py", "h_bb_P", "b_0_mass", "diH_py", "twist_t_0_t_1", "h_tt_py", "b_1_mva", "b_0_mva", "b_0_py", "b_0_px", "dR_h_bb_h_tt", "met_py", "sT", "h_tt_E", "twist_b_0_t_1", "b_1_P", "twist_h_bb_h_tt", "dR_b_1_t_0", "b_1_rawf", "dR_b_0_t_1", "b_0_E", "twist_b_0_b_1", "b_1_pz", "sphericity", "h_tt_svFit_P", "b_0_rawf", "b_1_E", "t_1_mass", "dR_b_1_t_1", "twist_b_0_t_0", "b_1_mass", "aplanarity", "h_bb_E"};
-
+            inputFeatures = std::vector<std::string>{'t_0_px', 't_0_py', 't_0_pz', 't_0_mass', 't_0_mT', 't_0_mT2', 't_1_px', 't_1_py', 't_1_pz', 't_1_mT', 't_1_mT2', 'b_0_px', 'b_0_py', 'b_0_pz', 'b_0_mass', 'b_0_csv', 'b_0_mva', 'b_1_px', 'b_1_py', 'b_1_pz', 'b_1_mass', 'b_1_csv', 'b_1_mva', 'met_px', 'met_py', 'met_pT', 'h_tt_svFit_px', 'h_tt_svFit_py', 'h_tt_svFit_pz', 'h_tt_svFit_mass', 'h_tt_svFit_mT', 'h_bb_px', 'h_bb_py', 'h_bb_pz', 'h_bb_mass', 'diH_px', 'diH_py', 'diH_pz', 'diH_kinFit_mass', 'diH_kinFit_chi2', 'diH_kinFit_conv', 'hT', 'hT_jets'};
             nInputs = inputFeatures.size();
             if (debug) std::cout << "Number of inputs = " << nInputs << "\n"; 
-            fixRotate = true;
-            means = std::vector<double>{1.51975727e+02, 7.52654900e+01, 8.01863353e+01, 6.65015349e-01,
-                                        5.39720100e-01, 2.16281726e+00, 3.47394597e+02, 1.46177934e+02,
-                                        -3.43958888e+01, 2.40596679e+02, 1.74137283e+02, -6.14251191e+00,
-                                        1.22171427e+00, 6.06015127e+01, 2.30166669e+00, 9.02781997e-03,
-                                        1.12850970e+02, 7.57175906e-01, 2.74846897e-02, 8.09292578e+01,
-                                        -5.57591636e+00, 2.58883688e+01, 6.02842410e+01, 7.32292869e+01,
-                                        1.06671012e+02, 5.82524521e+00, 6.00731750e+01, 2.27961314e+00,
-                                        7.50997040e+01, -2.69267843e-02, 9.86679103e+01, 4.13776832e+02,
-                                        7.32370268e+01, 6.45864637e-01, -9.15165277e-02, 1.99685160e+02,
-                                        1.33796957e+01, -5.26061143e-02, 1.02232670e+00, 3.89103972e-02,
-                                        7.33541062e-01, 9.05896742e-01, -6.45897434e-02, -2.88199642e+01,
-                                        2.77083011e+00, 2.98825635e-02, 3.76297981e+02, 2.47004615e+02,
-                                        1.06422319e+00, 8.92801863e+01, 1.12190555e+00, 2.26928485e+00,
-                                        9.62177250e-01, 2.27978916e+00, 1.72749791e+02, 9.49644769e-01,
-                                        2.44739771e-01, 1.45322584e-01, 2.16866152e+02, 9.49022483e-01,
-                                        8.97469292e+01, 1.03336092e-01, 2.25481780e+00, 1.05431104e+00,
-                                        7.96081071e+00, 2.29148069e-02, 2.62496733e+02};
-
-            scales = std::vector<double>{1.84480552e+02, 5.64743918e+01, 1.80491078e+02, 7.21862605e-01,
-                                        1.08463901e+00, 8.57375541e-01, 2.27266132e+02, 1.31747969e+02,
-                                        8.95539784e+01, 1.69815686e+02, 8.14561298e+01, 4.03259743e+01,
-                                        1.29212491e+00, 3.81177567e+01, 9.22236194e-01, 3.47127055e+01,
-                                        1.18240870e+02, 4.58208898e-01, 5.52398357e+01, 8.40699433e+01,
-                                        4.26822937e+01, 8.35897838e+01, 9.44174935e+01, 6.35768731e+01,
-                                        1.35527961e+02, 7.11098780e+01, 4.41501829e+01, 8.35063799e-01,
-                                        5.24411617e+01, 4.39083518e+01, 7.76575987e+01, 2.01006996e+02,
-                                        6.35740948e+01, 1.98028092e-01, 7.44401763e+01, 1.89707773e+02,
-                                        8.84189848e+00, 7.23776750e+01, 3.96959030e-01, 6.88636135e+01,
-                                        5.35210934e-01, 2.96898577e-01, 7.98386587e+01, 9.37883619e+01,
-                                        7.89903627e-01, 5.74412042e+01, 2.03471762e+02, 1.20611261e+02,
-                                        3.81936160e-01, 8.51928247e+01, 3.54703184e-01, 8.34483299e-01,
-                                        7.14557639e-02, 8.45458138e-01, 1.71230964e+02, 4.14316855e-01,
-                                        1.06994848e+02, 1.17839679e-01, 2.43664536e+02, 4.96963604e-02,
-                                        8.51913718e+01, 2.90527885e-02, 8.45313249e-01, 3.86712450e-01,
-                                        4.46438449e+00, 3.59402079e-02, 2.13738541e+02};
+            fixRotate = false;
+            means = std::vector<double>{-0.1657936073143518, -0.02343597761335125, -0.02333487075510067, 0.7571759061763041, 60.07317499459512, 2869.6694468305054, -0.07297886718953847, -0.1424106155513016, 0.44524331472619844, 75.26549004632871, 5125.517629839229, 0.3217521762395806, 0.03167422331295357, 0.1820295551516969, 13.3796957199172, 0.6650153490225249, 0.9058967415839231, 0.19548353148454786, 0.05472876784127139, 0.24473977070067915, 7.960810706709419, 0.5397200998473382, 0.733541062155672, -4.4959444784521425, 0.09154621832555666, 75.09970403638704, -2.058751842006953, -0.1639018615142105, 0.896506130083173, 151.97572651073563, 112.85097035145368, 0.5172357077241284, 0.08640299115422495, 0.42676932585237604, 146.17793435124494, -4.217483141339399, 0.0121026308756812, 0.8486774721410685, 347.39459744227133, 80.18633531111797, 1.2217142696209462, 240.59667854773232, 106.67101155276941};
+            scales = std::vector<double>{37.91032026787033, 37.83738043784793, 80.84338157047861, 0.4582088980672853, 44.150182870073564, 9008.729988183684, 50.81346334034539, 50.43284568441607, 103.15202297458833, 56.474391839078265, 10658.757901369183, 89.37596426490317, 89.51476724366489, 207.13346769052075, 8.841898478334382, 0.7218626046045415, 0.29689857740639586, 43.47660391395152, 43.480534550136625, 106.99484782426441, 4.464384494233613, 1.084639013069971, 0.5352109338151005, 64.72501554050605, 64.65671821966762, 52.44116169053776, 91.51396964739864, 91.04765128594751, 299.5560126044877, 184.48055241339125, 118.24086992369644, 85.9020495062545, 85.81902060076776, 247.2219239620548, 131.74796903083555, 80.54171752401825, 79.9451869105092, 328.6573063237755, 227.26613150940463, 180.49107816419902, 1.2921249079276635, 169.81568592889175, 135.52796067601696};
 
             input = tensorflow::Tensor(tensorflow::DT_FLOAT, {1, static_cast<int>(nInputs)});
             if (debug) std::cout << "DNN class initialised\n";
@@ -390,7 +356,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["centrality"] = centrality;
             features["eVis"] = eVis;
 
-            double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
+            /*double sphericity, spherocity, aplanarity, aplanority, upsilon, dShape,
                 sphericityEigen0, sphericityEigen1, sphericityEigen2,
                 spherocityEigen0, spherocityEigen1, spherocityEigen2;
             getPrimaryEventShapes(&t_0_p4, &t_1_p4, &bjet0_p4, &bjet0_p4,
@@ -428,7 +394,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             features["dR_b_1_t_0"] = DeltaR(bjet1_p4, t_0_p4);
             features["dR_b_1_t_1"] = DeltaR(bjet1_p4, t_1_p4);
             features["dR_t_0_t_1"] = DeltaR(t_0_p4, t_1_p4);
-            features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);
+            features["dR_h_bb_h_tt"] = DeltaR(hbb_p4, htt_p4);*/
 
             if (debug) std::cout << "Event loaded, populating input tensor\n";
             for (size_t i = 0; i < inputFeatures.size(); i++) { //Load selected input features into tensor with standardisation and nromalisation
@@ -450,7 +416,7 @@ class DnnMvaVariables : public MvaVariablesBase {
 
             std::vector<tensorflow::Tensor> outputs;
             if (debug) std::cout << "Evaluating event\n";
-            tensorflow::run(session, { { "dense_61_input", input } }, { "output_node0" }, &outputs);
+            tensorflow::run(session, { { "inputs", input } }, { "output_node0" }, &outputs);
             if (debug) std::cout << "Event evaulated, class prediction is: " << outputs[0].matrix<float>()(0, 0) << "\n";
             return outputs[0].matrix<float>()(0, 0);
         }
