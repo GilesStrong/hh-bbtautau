@@ -43,7 +43,7 @@ class DnnMvaVariables : public MvaVariablesBase {
             if (debug) std::cout << "Begun TF session\n";
 
             //Model config options //Todo: add way of changing these along with features, preprop settings, etc. from config file
-            inputFeatures = std::vector<std::string>{'t_0_px', 't_0_py', 't_0_pz', 't_0_mass', 't_0_mT', 't_0_mT2', 't_1_px', 't_1_py', 't_1_pz', 't_1_mT', 't_1_mT2', 'b_0_px', 'b_0_py', 'b_0_pz', 'b_0_mass', 'b_0_csv', 'b_0_mva', 'b_1_px', 'b_1_py', 'b_1_pz', 'b_1_mass', 'b_1_csv', 'b_1_mva', 'met_px', 'met_py', 'met_pT', 'h_tt_svFit_px', 'h_tt_svFit_py', 'h_tt_svFit_pz', 'h_tt_svFit_mass', 'h_tt_svFit_mT', 'h_bb_px', 'h_bb_py', 'h_bb_pz', 'h_bb_mass', 'diH_px', 'diH_py', 'diH_pz', 'diH_kinFit_mass', 'diH_kinFit_chi2', 'diH_kinFit_conv', 'hT', 'hT_jets'};
+            inputFeatures = std::vector<std::string>{"t_0_px", "t_0_py", "t_0_pz", "t_0_mass", "t_0_mT", "t_0_mT2", "t_1_px", "t_1_py", "t_1_pz", "t_1_mT", "t_1_mT2", "b_0_px", "b_0_py", "b_0_pz", "b_0_mass", "b_0_csv", "b_0_mva", "b_1_px", "b_1_py", "b_1_pz", "b_1_mass", "b_1_csv", "b_1_mva", "met_px", "met_py", "met_pT", "h_tt_svFit_px", "h_tt_svFit_py", "h_tt_svFit_pz", "h_tt_svFit_mass", "h_tt_svFit_mT", "h_bb_px", "h_bb_py", "h_bb_pz", "h_bb_mass", "diH_px", "diH_py", "diH_pz", "diH_kinFit_mass", "diH_kinFit_chi2", "diH_kinFit_conv", "hT", "hT_jets"};
             nInputs = inputFeatures.size();
             if (debug) std::cout << "Number of inputs = " << nInputs << "\n"; 
             fixRotate = false;
