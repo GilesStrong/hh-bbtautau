@@ -27,7 +27,7 @@ class DnnMvaVariables : public MvaVariablesBase {
         tensorflow::Session* session;
         tensorflow::Tensor input;
         
-        bool debug = false;
+        bool debug = true;
 
     public:
         DnnMvaVariables(const std::string& model) {
